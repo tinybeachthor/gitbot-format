@@ -2,6 +2,7 @@ const util = require('util')
 
 const checkStatus = require('./checkStatus')
 const getFiles = require('./getFiles')
+const FileFormatter = require('./formatter')
 
 async function format(context) {
   const {owner, repo, number} = context.issue()
@@ -10,7 +11,7 @@ async function format(context) {
   // GH API
   const {checks, pulls, git} = context.github
 
-  // Set PR check status
+  // PR check status
   const statusInfo = context.repo({
     name: "gitbot-format",
     head_sha: sha,
@@ -35,6 +36,8 @@ async function format(context) {
   })
 
   // Run formatter
+  const formatter = FileFormatter(files)
+  formatter.format()
 
   // If changed -> push blobs + create commit
 
