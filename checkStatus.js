@@ -1,4 +1,4 @@
-async function queued (checks, statusInfo) {
+function queued (checks, statusInfo) {
   return checks.create({
     ...statusInfo,
     status: "queued",
@@ -9,7 +9,7 @@ async function queued (checks, statusInfo) {
   })
 }
 
-async function progress (checks, statusInfo, started_at) {
+function progress (checks, statusInfo, started_at) {
   return checks.create({
     ...statusInfo,
     status: "in_progress",
@@ -21,7 +21,7 @@ async function progress (checks, statusInfo, started_at) {
   })
 }
 
-async function success (checks, statusInfo, started_at) {
+function success (checks, statusInfo, started_at) {
   return checks.create({
     ...statusInfo,
     status: "completed",
@@ -31,7 +31,7 @@ async function success (checks, statusInfo, started_at) {
     output: {
       title: 'gitbot-format',
       summary: 'Formatted all right!'
-    }
+    },
   })
 }
 
