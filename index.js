@@ -1,35 +1,7 @@
 const util = require('util')
 
+const getFiles = require('./getFiles')
 const format = require('./format')
-
-async function getFiles (github, pr) {
-  const { pulls, git } = github
-
-  const response = await pulls.listFiles(pr)
-
-  const promises = []
-  response.data.forEach(({ filename, sha }) => {
-    const promise = git
-      .getBlob({
-        owner: pr.owner,
-        repo: pr.repo,
-        file_sha: sha,
-      })
-      .then(({ data }) => {
-        const buffer = Buffer.from(data.content, 'base64')
-        const text = buffer.toString('ascii')
-        return {
-          filename,
-          content: text,
-        }
-      })
-
-    // push promise
-    promises.push(promise)
-  })
-
-  return Promise.all(promises)
-}
 
 /**
  * This is the main entrypoint to your Probot app
