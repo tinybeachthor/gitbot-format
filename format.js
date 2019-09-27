@@ -1,6 +1,6 @@
 const util = require('util')
 
-const checkStatus = require('./checkStatus')
+const Status = require('./status')
 const getFiles = require('./getFiles')
 const FileFormatter = require('./formatter')
 
@@ -11,21 +11,19 @@ async function format(context) {
   // GH API
   const {checks, pulls, git} = context.github
 
-  console.log(sha)
-  console.log(ref)
-
   // PR check status
-  const statusInfo = context.repo({
-    name: 'gitbot-format',
-    'head_sha': sha,
-  })
+  const status = Status(context.github.checks,
+    context.repo({
+      name: 'gitbot-format',
+      'head_sha': sha,
+    })
+  )
 
   // Queued
-  await checkStatus.queued(checks, statusInfo)
+  await status.queued()
 
   // In progress
-  const started_at = new Date()
-  await checkStatus.progress(checks, statusInfo, started_at)
+  await status.progress(new Date())
 
   // Get changed files
   const files = await getFiles(context.github, {
@@ -98,16 +96,6 @@ async function format(context) {
   }
 
   // Completed
-  await checks.create({
-    ...statusInfo,
-    status: "completed",
-    started_at,
-    completed_at: new Date(),
-    conclusion: "success",
-    output: {
-      title: 'gitbot-format',
-      summary: 'Formatted all right!'
-    },
-  })
+  await status.success()
 }
 module.exports = format
