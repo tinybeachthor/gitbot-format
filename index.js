@@ -1,12 +1,41 @@
 const util = require('util')
 
+const format = require('./format')
+
+async function getFiles (github, pr) {
+  const { pulls, git } = github
+
+  const response = await pulls.listFiles(pr)
+
+  const promises = []
+  response.data.forEach(({ filename, sha }) => {
+    const promise = git
+      .getBlob({
+        owner: pr.owner,
+        repo: pr.repo,
+        file_sha: sha,
+      })
+      .then(({ data }) => {
+        const buffer = Buffer.from(data.content, 'base64')
+        const text = buffer.toString('ascii')
+        return {
+          filename,
+          content: text,
+        }
+      })
+
+    // push promise
+    promises.push(promise)
+  })
+
+  return Promise.all(promises)
+}
+
 /**
  * This is the main entrypoint to your Probot app
  * @param {import('probot').Application} app
  */
 module.exports = bot => {
-  bot.log('Started')
-
   bot.on("pull_request.opened", check)
   bot.on("pull_request.synchronize", check)
 
@@ -23,37 +52,55 @@ module.exports = bot => {
       head_sha: sha,
     })
 
-    // Pending
+    // Queued
     await checks.create({
       ...statusInfo,
       status: "queued",
+      output: {
+        title: 'gitbot-format',
+        summary: 'Waiting to format...'
+      }
+    })
+
+    // In progress
+    const started_at = new Date()
+    await checks.create({
+      ...statusInfo,
+      status: "in_progress",
+      started_at,
+      output: {
+        title: 'gitbot-format',
+        summary: 'Formatting...'
+      }
     })
 
     // Get changed files
-    const files = await pulls.listFiles({
+    const files = await getFiles(context.github, {
       owner,
       repo,
       pull_number: number,
     })
 
-    files.data.forEach(({ filename, sha }) => {
-      bot.log(`\t${filename}`)
-      git.getBlob({
-        owner,
-        repo,
-        file_sha: sha,
-      }).then(({ data }) => {
-        bot.log(util.inspect(data))
-        const buffer = Buffer.from(data.content, 'base64')
-        const text = buffer.toString('ascii')
-        bot.log(text)
-      })
+    files.forEach(({ filename, content }) => {
+      bot.log(`${filename} : ${content}`)
     })
 
     // Run formatter
 
-    // Completed
+    // If changed -> push blobs + create commit
 
+    // Completed
+    await checks.create({
+      ...statusInfo,
+      status: "completed",
+      started_at,
+      completed_at: new Date(),
+      conclusion: "success",
+      output: {
+        title: 'gitbot-format',
+        summary: 'Formatted all right!'
+      }
+    })
   }
 
   // For more information on building apps:
