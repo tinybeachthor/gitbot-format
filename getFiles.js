@@ -15,7 +15,7 @@ async function getFiles (github, pr) {
       })
       .then(({ data }) => {
         const buffer = Buffer.from(data.content, 'base64')
-        const text = buffer.toString('ascii')
+        const text = buffer.toString('utf8')
         return {
           filename,
           content: text,
