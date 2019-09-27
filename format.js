@@ -40,6 +40,13 @@ async function format(context) {
   formatter.format()
 
   // If changed -> push blobs + create commit
+  const changedFiles = formatter.touched()
+  if (changedFiles.length > 0) {
+    // push new blobs
+
+    // create commit
+
+  }
 
   // Completed
   checkStatus.success(checks, checkStatus, started_at)
