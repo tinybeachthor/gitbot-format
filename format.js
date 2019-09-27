@@ -1,5 +1,6 @@
 const util = require('util')
 
+const checkStatus = require('./checkStatus')
 const getFiles = require('./getFiles')
 
 async function format(context) {
@@ -16,26 +17,11 @@ async function format(context) {
   })
 
   // Queued
-  await checks.create({
-    ...statusInfo,
-    status: "queued",
-    output: {
-      title: 'gitbot-format',
-      summary: 'Waiting to format...'
-    }
-  })
+  checkStatus.queued(checks, statusInfo)
 
   // In progress
   const started_at = new Date()
-  await checks.create({
-    ...statusInfo,
-    status: "in_progress",
-    started_at,
-    output: {
-      title: 'gitbot-format',
-      summary: 'Formatting...'
-    }
-  })
+  checkStatus.progress(checks, statusInfo, started_at)
 
   // Get changed files
   const files = await getFiles(context.github, {
@@ -53,16 +39,6 @@ async function format(context) {
   // If changed -> push blobs + create commit
 
   // Completed
-  await checks.create({
-    ...statusInfo,
-    status: "completed",
-    started_at,
-    completed_at: new Date(),
-    conclusion: "success",
-    output: {
-      title: 'gitbot-format',
-      summary: 'Formatted all right!'
-    }
-  })
+  checkStatus.success(checks, checkStatus, started_at)
 }
 module.exports = format
