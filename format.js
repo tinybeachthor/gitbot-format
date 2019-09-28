@@ -2,7 +2,7 @@ const util = require('util')
 
 const Status = require('./status')
 const getFiles = require('./getFiles')
-const FileFormatter = require('./formatter')
+const formatter = require('./formatter')
 
 async function format(context) {
   const {owner, repo, number} = context.issue()
@@ -33,12 +33,9 @@ async function format(context) {
   })
 
   // Run formatter
-  const formatter = FileFormatter(files)
-  formatter.format()
+  const changedFiles = await formatter(files)
 
   // If changed -> push blobs + create tree + create commit
-  const changedFiles = formatter.touched()
-
   if (changedFiles.length > 0) {
     // push new blobs
     const blobsPromises = []
