@@ -1,5 +1,7 @@
 const util = require('util')
 
+const logger = require('./logger')
+
 const Status = require('./status')
 const getFiles = require('./getFiles')
 const formatter = require('./formatter')
@@ -21,9 +23,11 @@ async function format(context) {
 
   // Queued
   await status.queued()
+  logger.info(`${ref}:${sha}: Queued`)
 
   // In progress
   await status.progress(new Date())
+  logger.info(`${ref}:${sha}: In Progress`)
 
   // Get changed files
   const files = await getFiles(context.github, {
@@ -31,9 +35,11 @@ async function format(context) {
     repo,
     pull_number: number,
   })
+  logger.info(`${ref}:${sha}: Got changed files`)
 
   // Run formatter
   const changedFiles = await formatter(files)
+  logger.info(`${ref}:${sha}: Formatted`)
 
   // If changed -> push blobs + create tree + create commit
   if (changedFiles.length > 0) {
@@ -53,6 +59,7 @@ async function format(context) {
       blobsPromises.push(promise)
     })
     const blobs = await Promise.all(blobsPromises)
+    logger.info(`${ref}:${sha}: Created blobs`)
 
     // create tree
     const tree = []
@@ -70,6 +77,7 @@ async function format(context) {
       tree,
       base_tree: sha,
     })
+    logger.info(`${ref}:${sha}: Created tree`)
 
     // create commit
     const commitResponse = await git.createCommit({
@@ -79,6 +87,7 @@ async function format(context) {
       tree: treeResponse.data.sha,
       parents: [sha],
     })
+    logger.info(`${ref}:${sha}: Created commit`)
 
     // update branch reference
     const referenceResponse = await git.updateRef({
@@ -88,11 +97,16 @@ async function format(context) {
       sha: commitResponse.data.sha,
       force: false,
     })
+    logger.info(`${ref}:${sha}: Updated ref`)
 
     console.log(util.inspect(referenceResponse.data))
+  }
+  else {
+    logger.info(`${ref}:${sha}: No files changed`)
   }
 
   // Completed
   await status.success()
+  logger.info(`${ref}:${sha}: Completed`)
 }
 module.exports = format

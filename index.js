@@ -1,3 +1,4 @@
+const logger = require('./logger')
 const format = require('./format')
 
 /**
@@ -5,6 +6,8 @@ const format = require('./format')
  * @param {import('probot').Application} app
  */
 module.exports = bot => {
+  logger.info('bot started up')
+
   bot.on("pull_request.opened", format)
   bot.on("pull_request.synchronize", format)
 
