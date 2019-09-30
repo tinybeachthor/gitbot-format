@@ -7,17 +7,17 @@ const eventEmitter = new events.EventEmitter()
 
 const eventName = 'gitbot-format-request'
 
-eventEmitter.on(eventName, async (context) => {
-  const {owner, repo, number} = context.issue()
+eventEmitter.on(eventName, async (pr_info, git, checks) => {
+  const {owner, repo, pull_number, sha, ref} = pr_info
   logger.info(`${owner}:${repo}:${number} Handling`)
-  await format(context)
+  await format(pr_info, git, checks)
   logger.info(`${owner}:${repo}:${number} Handled`)
 })
 
-function enqueue(context) {
-  const {owner, repo, number} = context.issue()
+function enqueue(pr_info, git, checks) {
+  const {owner, repo, pull_number, sha, ref} = pr_info
   logger.info(`${owner}:${repo}:${number} Enqueued`)
-  eventEmitter.emit(eventName, context)
+  eventEmitter.emit(eventName, pr_info, git, checks)
 }
 
 module.exports = {

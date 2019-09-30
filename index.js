@@ -13,10 +13,25 @@ const Octokit = require("@octokit/rest")
 module.exports = async bot => {
   logger.info('bot starting up')
 
-  bot.on("pull_request.opened", (context) => enqueue(context))
-  bot.on("pull_request.synchronize", (context) => enqueue(context))
+  const enqueuePR = (context) => {
+    const {owner, repo, number} = context.issue()
+    const {sha, ref} = context.payload.pull_request.head
 
-  await setup(bot)
+    // GH API
+    const {checks, git} = context.github
+
+    enqueue({
+      owner,
+      repo,
+      pull_number: number,
+      sha,
+      ref,
+    }, git, checks)
+  }
+  bot.on("pull_request.opened", enqueuePR)
+  bot.on("pull_request.synchronize", enqueuePR)
+
+  await recheckOpened(bot)
 
   logger.info('bot started up')
 
@@ -27,7 +42,7 @@ module.exports = async bot => {
   // https://probot.github.io/docs/development/
 }
 
-async function setup(bot) {
+async function recheckOpened(bot) {
   // get app data
   const octokitJWT = new Octokit({
     auth: bot.app.getSignedJsonWebToken(),
@@ -54,6 +69,15 @@ async function setup(bot) {
         state: 'open',
       })
       console.log(util.inspect(prsResponse.data))
+
+      // enqueue for checking
+      enqueue({
+        owner: owner.login,
+        repo: name,
+        pull_number: prsResponse.data.number,
+        sha: prsResponse.data.head.sha,
+        ref: prsResponse.data.head.ref,
+      }, octokitIT.git, octokitIT.checks)
     })
   })
 }

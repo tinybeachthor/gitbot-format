@@ -6,15 +6,9 @@ const Status = require('./status')
 const getFiles = require('./getFiles')
 const formatter = require('./formatter')
 
-async function format(context) {
-  const {owner, repo, number} = context.issue()
-  const {sha, ref} = context.payload.pull_request.head
-
-  // GH API
-  const {checks, pulls, git} = context.github
-
+async function format({owner, repo, pull_number, sha, ref}, git, checks) {
   // PR check status
-  const status = Status(context.github.checks,
+  const status = Status(checks,
     context.repo({
       name: 'gitbot-format',
       'head_sha': sha,
@@ -33,7 +27,7 @@ async function format(context) {
   const files = await getFiles(context.github, {
     owner,
     repo,
-    pull_number: number,
+    pull_number,
   })
   logger.info(`${ref}:${sha}: Got changed files`)
 
