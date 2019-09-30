@@ -18,7 +18,7 @@ module.exports = files => {
           return {
             filename,
             content: transformed,
-            touched: transformed !== content,
+            touched: transformed != content,
           }
         })
       promises.push(promise)

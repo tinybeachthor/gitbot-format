@@ -1,5 +1,3 @@
-const util = require('util')
-
 const logger = require('./logger')
 
 const Status = require('./status')
@@ -92,8 +90,6 @@ async function format({owner, repo, pull_number, sha, ref}, git, checks, pulls) 
       force: false,
     })
     logger.info(`${ref}:${sha}: Updated ref`)
-
-    console.log(util.inspect(referenceResponse.data))
   }
   else {
     logger.info(`${ref}:${sha}: No files changed`)
