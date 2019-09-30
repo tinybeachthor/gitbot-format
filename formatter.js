@@ -24,5 +24,5 @@ module.exports = files => {
       promises.push(promise)
     })
 
-  return Promise.all(promises)
+  return Promise.all(promises).then(fs => fs.filter(({touched}) => touched))
 }

@@ -5,6 +5,8 @@ const getFiles = require('./getFiles')
 const formatter = require('./formatter')
 
 async function format({owner, repo, pull_number, sha, ref}, git, checks, pulls) {
+  const info = (message) =>
+    logger.info(`${owner}/${repo}/${ref}:${sha}: ${message}`)
   // PR check status
   const status = Status(checks, {
       owner,
@@ -15,11 +17,11 @@ async function format({owner, repo, pull_number, sha, ref}, git, checks, pulls) 
 
   // Queued
   await status.queued()
-  logger.info(`${ref}:${sha}: Queued`)
+  info('Queued')
 
   // In progress
   await status.progress(new Date())
-  logger.info(`${ref}:${sha}: In Progress`)
+  info('In Progress')
 
   // Get changed files
   const files = await getFiles({git,pulls}, {
@@ -27,11 +29,11 @@ async function format({owner, repo, pull_number, sha, ref}, git, checks, pulls) 
     repo,
     pull_number,
   })
-  logger.info(`${ref}:${sha}: Got changed files`)
+  info('Got changed files')
 
   // Run formatter
   const changedFiles = await formatter(files)
-  logger.info(`${ref}:${sha}: Formatted`)
+  info('Formatted')
 
   // If changed -> push blobs + create tree + create commit
   if (changedFiles.length > 0) {
@@ -51,7 +53,7 @@ async function format({owner, repo, pull_number, sha, ref}, git, checks, pulls) 
       blobsPromises.push(promise)
     })
     const blobs = await Promise.all(blobsPromises)
-    logger.info(`${ref}:${sha}: Created blobs`)
+    info('Created blobs')
 
     // create tree
     const tree = []
@@ -69,7 +71,7 @@ async function format({owner, repo, pull_number, sha, ref}, git, checks, pulls) 
       tree,
       base_tree: sha,
     })
-    logger.info(`${ref}:${sha}: Created tree`)
+    info('Created tree')
 
     // create commit
     const commitResponse = await git.createCommit({
@@ -79,7 +81,7 @@ async function format({owner, repo, pull_number, sha, ref}, git, checks, pulls) 
       tree: treeResponse.data.sha,
       parents: [sha],
     })
-    logger.info(`${ref}:${sha}: Created commit`)
+    info('Created commit')
 
     // update branch reference
     const referenceResponse = await git.updateRef({
@@ -89,14 +91,14 @@ async function format({owner, repo, pull_number, sha, ref}, git, checks, pulls) 
       sha: commitResponse.data.sha,
       force: false,
     })
-    logger.info(`${ref}:${sha}: Updated ref`)
+    info('Updated ref')
   }
   else {
-    logger.info(`${ref}:${sha}: No files changed`)
+    info('No files changed')
   }
 
   // Completed
   await status.success()
-  logger.info(`${ref}:${sha}: Completed`)
+  info('Completed')
 }
 module.exports = format
