@@ -6,16 +6,15 @@ RUN apk update && apk add \
   git
 # install yarn
 RUN npm install --global yarn
-# install pm2
-RUN yarn global add pm2
 
 WORKDIR /gitbot-format
-ADD package.json yarn.lock
+ADD package.json yarn.lock ./
 RUN yarn install --production --frozen-lockfile
 
 # add app files
 COPY . .
 
 # start
+EXPOSE 3000
 USER node
-ENTRYPOINT ["pm2-docker"]
+CMD ["yarn", "start"]
