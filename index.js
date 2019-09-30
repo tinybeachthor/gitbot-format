@@ -1,5 +1,6 @@
 const logger = require('./logger')
-const format = require('./format')
+
+const { enqueue } = require('./dispatcher')
 
 const util = require('util')
 
@@ -11,6 +12,9 @@ const Octokit = require("@octokit/rest")
  */
 module.exports = async bot => {
   logger.info('bot starting up')
+
+  bot.on("pull_request.opened", (context) => enqueue(context))
+  bot.on("pull_request.synchronize", (context) => enqueue(context))
 
   await setup(bot)
 
@@ -47,11 +51,9 @@ async function setup(bot) {
       const prsResponse = await octokitIT.pulls.list({
         owner: owner.login,
         repo: name,
+        state: 'open',
       })
       console.log(util.inspect(prsResponse.data))
     })
   })
-
-  // bot.on("pull_request.opened", format)
-  // bot.on("pull_request.synchronize", format)
 }
