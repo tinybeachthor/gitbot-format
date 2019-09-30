@@ -6,14 +6,14 @@ const Status = require('./status')
 const getFiles = require('./getFiles')
 const formatter = require('./formatter')
 
-async function format({owner, repo, pull_number, sha, ref}, git, checks) {
+async function format({owner, repo, pull_number, sha, ref}, git, checks, pulls) {
   // PR check status
-  const status = Status(checks,
-    context.repo({
+  const status = Status(checks, {
+      owner,
+      repo,
       name: 'gitbot-format',
-      'head_sha': sha,
+      head_sha: sha,
     })
-  )
 
   // Queued
   await status.queued()
@@ -24,7 +24,7 @@ async function format({owner, repo, pull_number, sha, ref}, git, checks) {
   logger.info(`${ref}:${sha}: In Progress`)
 
   // Get changed files
-  const files = await getFiles(context.github, {
+  const files = await getFiles({git,pulls}, {
     owner,
     repo,
     pull_number,
