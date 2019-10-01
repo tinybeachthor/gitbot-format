@@ -1,6 +1,7 @@
 const logger = require('./logger')
 
 const util = require('util')
+const yaml = require('js-yaml')
 
 const Status = require('./status')
 const getFiles = require('./getFiles')
@@ -19,8 +20,14 @@ async function getStylefile({owner, repo, ref}, repos, info) {
     const buffer = Buffer.from(stylefileResponse.data.content, 'base64')
     const text = buffer.toString('utf8')
 
-    info('Got stylefile')
-    return text
+    // flatten YAML docs into single and convert YAML to JSON
+    const json = JSON.stringify(yaml.safeLoadAll(text).reduce((acc, doc) => {
+      Object.keys(doc).forEach((key) => acc[key] = doc[key])
+      return acc
+    }), {})
+
+    info(`Got stylefile : ${json}`)
+    return json
   }
   catch (e) {
     console.log(util.inspect(e))
@@ -49,7 +56,7 @@ async function format(
   info('Queued')
 
   // Check if exists and get /.clang-format
-  const stylefile = await getStylefile({owner, repo, ref}, repos, info)
+  const style = await getStylefile({owner, repo, ref}, repos, info)
 
   // In progress
   await status.progress(new Date())
@@ -65,7 +72,7 @@ async function format(
   info(`Got PR's changed files : ${filenames}`)
 
   // Run formatter
-  const changedFiles = await formatter(files)
+  const changedFiles = await formatter(files, style)
   info('Formatted')
 
   // If changed -> push blobs + create tree + create commit
