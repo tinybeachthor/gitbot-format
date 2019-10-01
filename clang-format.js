@@ -1,9 +1,11 @@
 const {spawn} = require('child_process')
 
-module.exports = content => {
+module.exports = (content, style) => {
   return new Promise((resolve, reject) => {
+    const formattedStyle = style ? "'" + style + "'" : 'Google'
+
     // spawn process
-    const format = spawn('clang-format', ['-style=LLVM'])
+    const format = spawn('clang-format -style=' + formattedStyle, [], {shell:true})
 
     // pipe data
     format.stdin.write(content)
