@@ -1,17 +1,18 @@
 # gitbot-format
 
-> A GitHub App built with [Probot](https://github.com/probot/probot) that A Probot app
+A GitHub App using the [Probot](https://github.com/probot/probot) framework
 
-## Setup
+Keeps your repos tidy by running ```clang-format``` on every PR.
 
-```sh
-# Install dependencies
-yarn install
+## Features
 
-# Run the bot
-yarn start
-```
+### Zero configuration
+No configuration neccessary, just install it and enjoy.
+
+### Fully stateless
+On every restart it rechecks all open PRs in installed repos.
+Making it easy to restart/upgrade/migrate/manage the deployment.
 
 ## License
-
 [ISC](LICENSE) © 2019 Martin Toman <whomenope@outlook.com>
+
