@@ -29,7 +29,8 @@ async function format({owner, repo, pull_number, sha, ref}, git, checks, pulls) 
     repo,
     pull_number,
   })
-  info('Got changed files')
+  const filenames = files.reduce((acc, {filename}) => `${acc}${filename},`, '')
+  info(`Got changed files : ${filenames}`)
 
   // Run formatter
   const changedFiles = await formatter(files)
