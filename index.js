@@ -1,5 +1,7 @@
 const logger = require('./logger')
 
+const util = require('util')
+
 const { enqueue } = require('./dispatcher')
 
 const Octokit = require("@octokit/rest")
@@ -15,16 +17,13 @@ module.exports = async bot => {
     const {owner, repo, number} = context.issue()
     const {sha, ref} = context.payload.pull_request.head
 
-    // GH API
-    const {checks, git, pulls} = context.github
-
     enqueue({
       owner,
       repo,
       pull_number: number,
       sha,
       ref,
-    }, git, checks, pulls)
+    }, context.github)
   }
   bot.on("pull_request.opened", enqueuePR)
   bot.on("pull_request.synchronize", enqueuePR)
@@ -67,8 +66,6 @@ async function recheckOpened(bot) {
         state: 'open',
       })
 
-      const {git,checks,pulls} = octokitIT
-
       prsResponse.data.forEach((pr) => {
         // enqueue for checking
         enqueue({
@@ -77,7 +74,7 @@ async function recheckOpened(bot) {
           pull_number: pr.number,
           sha: pr.head.sha,
           ref: pr.head.ref,
-        }, git, checks, pulls)
+        }, octokitIT)
       })
     })
   })

@@ -1,12 +1,41 @@
 const logger = require('./logger')
 
+const util = require('util')
+
 const Status = require('./status')
 const getFiles = require('./getFiles')
 const formatter = require('./formatter')
 
-async function format({owner, repo, pull_number, sha, ref}, git, checks, pulls) {
+const stylefileName = '.clang-format'
+
+async function getStylefile({owner, repo, ref}, repos, info) {
+  try {
+    const stylefileResponse = await repos.getContents({
+      owner,
+      repo,
+      path: stylefileName,
+      ref,
+    })
+    const buffer = Buffer.from(stylefileResponse.data.content, 'base64')
+    const text = buffer.toString('utf8')
+
+    info('Got stylefile')
+    return text
+  }
+  catch (e) {
+    console.log(util.inspect(e))
+    info('Could not get stylefile, falling back to defaults.')
+    return null
+  }
+}
+
+async function format(
+  {owner, repo, pull_number, sha, ref},
+  {checks, git, pulls, repos}
+) {
   const info = (message) =>
     logger.info(`${owner}/${repo}/${ref}:${sha}: ${message}`)
+
   // PR check status
   const status = Status(checks, {
       owner,
@@ -19,6 +48,9 @@ async function format({owner, repo, pull_number, sha, ref}, git, checks, pulls) 
   await status.queued()
   info('Queued')
 
+  // Check if exists and get /.clang-format
+  const stylefile = await getStylefile({owner, repo, ref}, repos, info)
+
   // In progress
   await status.progress(new Date())
   info('In Progress')
@@ -30,7 +62,7 @@ async function format({owner, repo, pull_number, sha, ref}, git, checks, pulls) 
     pull_number,
   })
   const filenames = files.reduce((acc, {filename}) => `${acc}${filename},`, '')
-  info(`Got changed files : ${filenames}`)
+  info(`Got PR's changed files : ${filenames}`)
 
   // Run formatter
   const changedFiles = await formatter(files)
@@ -95,7 +127,7 @@ async function format({owner, repo, pull_number, sha, ref}, git, checks, pulls) 
     info('Updated ref')
   }
   else {
-    info('No files changed')
+    info('No files touched')
   }
 
   // Completed
