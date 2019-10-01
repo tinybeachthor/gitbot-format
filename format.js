@@ -1,6 +1,5 @@
 const logger = require('./logger')
 
-const util = require('util')
 const yaml = require('js-yaml')
 
 const Status = require('./status')
@@ -30,7 +29,6 @@ async function getStylefile({owner, repo, ref}, repos, info) {
     return json
   }
   catch (e) {
-    console.log(util.inspect(e))
     info('Could not get stylefile, falling back to defaults.')
     return null
   }
