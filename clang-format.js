@@ -2,14 +2,13 @@ const {spawn} = require('child_process')
 
 module.exports = (content, style) => {
   return new Promise((resolve, reject) => {
-    const formattedStyle = style ? "'" + style + "'" : 'Google'
+
+    const formattedStyle = Buffer.from(style ? style : 'Google')
 
     // spawn process
-    const format = spawn('clang-format -style=' + formattedStyle, [], {shell:true})
-
-    // pipe data
-    format.stdin.write(content)
-    format.stdin.end()
+    const options = ["-style="+formattedStyle.toString('utf8')]
+    console.log(options)
+    const format = spawn('clang-format', options)
 
     // wait for output
     let output = ""
@@ -19,7 +18,7 @@ module.exports = (content, style) => {
 
     // check for errors
     format.stderr.on('data', data => {
-      reject(data)
+      reject(data.toString())
     })
 
     // resolve on close
@@ -31,5 +30,9 @@ module.exports = (content, style) => {
         reject(code)
       }
     })
+
+    // pipe data
+    format.stdin.write(content)
+    format.stdin.end()
   })
 }
