@@ -1,8 +1,9 @@
 # gitbot-format
-
 A GitHub App using the [Probot](https://github.com/probot/probot) framework
 
 Keeps your repos tidy by running ```clang-format``` on every PR.
+
+[Install to your repo!](https://github.com/apps/gitbot-format)
 
 ## Features
 ### Respects repo stylefile
@@ -21,6 +22,15 @@ Making it easy to restart/upgrade/migrate/manage the deployment.
 > prefering the default branch stylefile will enforce the same style on all
 > feature branches and make changes to the stylefile propagate instantly
 > (no need to rebase every feature branch)
+
+## Changelog
+|version|changes|
+|---|---|
+|0.2.2|Use .clang-format from default branch first|
+|0.2.1|Fix .clang-format values passing to clang-format process|
+|0.2.0|Respect repo .clang-format|
+|---|---|
+|0.1.0|MVP|
 
 ## License
 [ISC](LICENSE) © 2019 Martin Toman <whomenope@outlook.com>
