@@ -7,7 +7,6 @@ module.exports = (content, style) => {
 
     // spawn process
     const options = ["-style="+formattedStyle.toString('utf8')]
-    console.log(options)
     const format = spawn('clang-format', options)
 
     // wait for output
