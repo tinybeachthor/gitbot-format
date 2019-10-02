@@ -11,11 +11,11 @@ const Octokit = require("@octokit/rest")
 module.exports = async bot => {
   logger.info('bot starting up')
 
-  const enqueuePR = (context) => {
+  const enqueuePR = async (context) => {
     const {owner, repo, number} = context.issue()
     const {sha, ref} = context.payload.pull_request.head
 
-    enqueue({
+    await enqueue({
       owner,
       repo,
       pull_number: number,

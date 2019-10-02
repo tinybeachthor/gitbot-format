@@ -2,7 +2,6 @@ const logger = require('./logger')
 
 const yaml = require('js-yaml')
 
-const Status = require('./status')
 const getFiles = require('./getFiles')
 const formatter = require('./formatter')
 
@@ -60,29 +59,18 @@ async function getStylefile({owner, repo, ref}, repos, info) {
 
 async function format(
   {owner, repo, pull_number, sha, ref},
-  {checks, git, pulls, repos}
+  {checks, git, pulls, repos},
+  status
 ) {
   const info = (message) =>
     logger.info(`${owner}/${repo}/${ref}:${sha}: ${message}`)
 
-  // PR check status
-  const status = Status(checks, {
-      owner,
-      repo,
-      name: 'gitbot-format',
-      head_sha: sha,
-    })
-
-  // Queued
-  await status.queued()
-  info('Queued')
-
-  // Check if exists and get /.clang-format
-  const style = await getStylefile({owner, repo, ref}, repos, info)
-
   // In progress
   await status.progress(new Date())
   info('In Progress')
+
+  // Check if exists and get /.clang-format
+  const style = await getStylefile({owner, repo, ref}, repos, info)
 
   // Get changed files
   const files = await getFiles({git,pulls}, {
