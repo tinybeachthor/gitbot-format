@@ -1,12 +1,11 @@
-FROM node:10-alpine
+FROM node:lts-buster
 
 # install dependencies
-RUN apk update && apk add \
-  clang \
+RUN apt update -y && apt install -y \
+  clang-format \
   git
-# install yarn
-RUN npm install --global yarn
 
+# install app
 WORKDIR /gitbot-format
 ADD package.json yarn.lock ./
 RUN yarn install --production --frozen-lockfile
