@@ -3,33 +3,56 @@ const logger = require('./logger')
 const Status = require('./status')
 const format = require('./format')
 
-const events = require('events')
-const eventEmitter = new events.EventEmitter()
+function Queue() {
+  const queue = []
+  queue.active = false
 
-const eventName = 'gitbot-format-request'
+  queue.place = function (command) {
+    queue.push(command)
+    if (!queue.active) queue.next()
+  }
+  queue.next = async function () {
+    if (!queue.length) {
+      queue.active = false
+      return
+    }
+    var command = queue.shift()
+    queue.active = true
+    await command()
+    queue.next()
+  }
+  return queue
+}
+const queue = Queue()
 
-eventEmitter.on(eventName, async (pr_info, github, status) => {
+function handle(pr_info, github, status) {
   const {owner, repo, pull_number, sha, ref} = pr_info
-  logger.info(`${owner}:${repo}:${pull_number} Handling`)
-  await format(pr_info, github, status)
-  logger.info(`${owner}:${repo}:${pull_number} Handled`)
-})
+
+  const task = async () => {
+    logger.info(`${owner}:${repo}:${pull_number} Handling`)
+    await format(pr_info, github, status)
+    logger.info(`${owner}:${repo}:${pull_number} Handled`)
+  }
+
+  queue.place(task)
+}
 
 async function enqueue(pr_info, github) {
   const {owner, repo, pull_number, sha, ref} = pr_info
 
-  // PR check status
+  // PR status check
   const status = Status(github.checks, {
       owner,
       repo,
       name: 'gitbot-format',
       head_sha: sha,
     })
+
   // Queued
   await status.queued()
   logger.info(`${owner}/${repo}/${ref}#${pull_number}:${sha} Enqueued`)
 
-  eventEmitter.emit(eventName, pr_info, github, status)
+  handle(pr_info, github, status)
 }
 
 module.exports = {
