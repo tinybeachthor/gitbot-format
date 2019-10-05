@@ -1,4 +1,5 @@
 const logger = require('./logger')
+const util = require('util')
 
 const { enqueue } = require('./dispatcher')
 
@@ -11,6 +12,7 @@ const Octokit = require("@octokit/rest")
 module.exports = async bot => {
   logger.info('bot starting up')
 
+  // PR open/updated
   const enqueuePR = async (context) => {
     const {owner, repo, number} = context.issue()
     const {sha, ref} = context.payload.pull_request.head
@@ -26,6 +28,15 @@ module.exports = async bot => {
   bot.on("pull_request.opened", enqueuePR)
   bot.on("pull_request.synchronize", enqueuePR)
 
+  // Check run requested action
+  const requestedFormat = async (context) => {
+    const {owner, repo} = context.issue()
+    const {head_branch, head_sha} = context.payload.check_run.check_suite
+    console.log(owner, repo, head_branch, head_sha)
+  }
+  bot.on("check_run.requested_action", requestedFormat)
+
+  // Rerun on all opened PRs
   await recheckOpened(bot)
 
   logger.info('bot started up')
