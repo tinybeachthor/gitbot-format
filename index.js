@@ -32,7 +32,15 @@ module.exports = async bot => {
   const requestedFormat = async (context) => {
     const {owner, repo} = context.issue()
     const {head_branch, head_sha} = context.payload.check_run.check_suite
-    console.log(owner, repo, head_branch, head_sha)
+    const pull_number = context.payload.check_run.check_suite.pull_requests[0].number
+
+    await enqueue(actions.FORMAT, {
+      owner,
+      repo,
+      pull_number,
+      sha: head_sha,
+      ref: head_branch,
+    }, context.github)
   }
   bot.on("check_run.requested_action", requestedFormat)
 
