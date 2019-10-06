@@ -1,7 +1,7 @@
 const logger = require('./logger')
 const util = require('util')
 
-const { enqueue } = require('./dispatcher')
+const { enqueue, actions } = require('./dispatcher')
 
 const Octokit = require("@octokit/rest")
 
@@ -17,7 +17,7 @@ module.exports = async bot => {
     const {owner, repo, number} = context.issue()
     const {sha, ref} = context.payload.pull_request.head
 
-    await enqueue({
+    await enqueue(actions.FORMAT, {
       owner,
       repo,
       pull_number: number,
@@ -77,7 +77,7 @@ async function recheckOpened(bot) {
 
       prsResponse.data.forEach((pr) => {
         // enqueue for checking
-        enqueue({
+        enqueue(actions.FORMAT, {
           owner: owner.login,
           repo: name,
           pull_number: pr.number,

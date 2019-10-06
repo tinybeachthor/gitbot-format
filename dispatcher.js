@@ -25,19 +25,27 @@ function Queue() {
 }
 const queue = Queue()
 
-function handle(pr_info, github, status) {
+function handle(action, pr_info, github, status) {
   const {owner, repo, pull_number, sha, ref} = pr_info
 
   const task = async () => {
-    logger.info(`${owner}:${repo}:${pull_number} Handling`)
-    await format(pr_info, github, status)
-    logger.info(`${owner}:${repo}:${pull_number} Handled`)
+    logger.info(`${action}:${owner}/${repo}/${ref}:${sha} Handling`)
+
+    switch (action) {
+      case actions.FORMAT:
+        await format(pr_info, github, status)
+        break
+      case actions.LINT:
+        break
+    }
+
+    logger.info(`${action}:${owner}/${repo}/${$ref}:${sha} Handled`)
   }
 
   queue.place(task)
 }
 
-async function enqueue(pr_info, github) {
+async function enqueue(action, pr_info, github) {
   const {owner, repo, pull_number, sha, ref} = pr_info
 
   // PR status check
@@ -52,9 +60,15 @@ async function enqueue(pr_info, github) {
   await status.queued()
   logger.info(`${owner}/${repo}/${ref}#${pull_number}:${sha} Enqueued`)
 
-  handle(pr_info, github, status)
+  handle(action, pr_info, github, status)
+}
+
+const actions = {
+  FORMAT: "FORMAT",
+  LINT: "LINT",
 }
 
 module.exports = {
   enqueue,
+  actions,
 }
