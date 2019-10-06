@@ -9,7 +9,7 @@ module.exports = (checks, statusInfo) => {
       status: "queued",
       output: {
         title,
-        summary: 'Waiting to format...'
+        summary: 'Queued...'
       }
     })
   }
@@ -28,6 +28,28 @@ module.exports = (checks, statusInfo) => {
     })
   }
 
+  function error (annotations) {
+    return checks.create({
+      ...statusInfo,
+      status: "completed",
+      started_at,
+      completed_at: new Date(),
+      conclusion: "failure",
+      output: {
+        title,
+        summary: `That's some nasty code.`,
+        annotations,
+      },
+      actions: [
+        {
+          label: 'Format!',
+          description: 'Format files in this PR.',
+          identifier: 'gitbot-format_format',
+        },
+      ],
+    })
+  }
+
   function success () {
     return checks.create({
       ...statusInfo,
@@ -37,7 +59,13 @@ module.exports = (checks, statusInfo) => {
       conclusion: "success",
       output: {
         title,
-        summary: 'Formatted all right!'
+        summary: 'Formatted all right!',
+        images: [
+          {
+            alt: 'celebration',
+            image_url: 'https://i.imgur.com/xS6ZYWn.gif',
+          },
+        ],
       },
     })
   }
@@ -45,6 +73,7 @@ module.exports = (checks, statusInfo) => {
   return {
     queued,
     progress,
+    error,
     success,
   }
 }

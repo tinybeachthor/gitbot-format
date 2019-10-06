@@ -1,5 +1,7 @@
 const logger = require('./logger')
+const util = require('util')
 
+const { structuredPatch } = require('diff')
 const yaml = require('js-yaml')
 
 const getFiles = require('./getFiles')
@@ -78,7 +80,7 @@ async function format(
     repo,
     pull_number,
   })
-  const filenames = files.reduce((acc, {filename}) => `${acc}${filename},`, '')
+  const filenames = files.reduce((acc, {filename}) => `${acc}${filename};`, '')
   info(`Got PR's changed files : ${filenames}`)
 
   // Run formatter
@@ -173,7 +175,7 @@ async function lint(
     repo,
     pull_number,
   })
-  const filenames = files.reduce((acc, {filename}) => `${acc}${filename},`, '')
+  const filenames = files.reduce((acc, {filename}) => `${acc}${filename};`, '')
   info(`Got PR's changed files : ${filenames}`)
 
   // Run formatter
@@ -182,8 +184,7 @@ async function lint(
 
   // If files touched -> check status annotations
   if (changedFiles.length > 0) {
-    const annotations = []
-
+    const annotations = generateAnnotation(changedFiles, files)
     await status.error(annotations)
   }
   else {
@@ -191,6 +192,34 @@ async function lint(
     await status.success()
   }
   info('Completed')
+}
+
+function generateAnnotation(changedFiles, files) {
+  function findFile(filename) {
+    for (const file of files) {
+      if (filename === file.filename) return file
+    }
+    return null
+  }
+
+  const annotations = []
+  changedFiles.forEach(({filename, content}) => {
+    original = findFile(filename)
+    if (original) {
+      diff = structuredPatch(filename, filename, original.content, content)
+      diff.hunks.forEach(({oldStart, oldLines}) => {
+        const annotation = {
+          path: filename,
+          start_line: oldStart,
+          end_line: oldStart + oldLines,
+          annotation_level: 'failure',
+          message: `Lines ${oldStart}:${oldStart+oldLines} need formatting.`,
+        }
+        annotations.push(annotation)
+      })
+    }
+  })
+  return annotations
 }
 
 module.exports = {

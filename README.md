@@ -26,6 +26,9 @@ Making it easy to restart/upgrade/migrate/manage the deployment.
 ## Changelog
 |version|changes|
 |---|---|
+|0.3.0|Format on action, lint by default|
+|---|---|
+|0.2.3|Set queued status as soon as possible|
 |0.2.2|Use .clang-format from default branch first|
 |0.2.1|Fix .clang-format values passing to clang-format process|
 |0.2.0|Respect repo .clang-format|
