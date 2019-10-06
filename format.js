@@ -151,4 +151,49 @@ async function format(
   await status.success()
   info('Completed')
 }
-module.exports = format
+
+async function lint(
+  {owner, repo, pull_number, sha, ref},
+  {checks, git, pulls, repos},
+  status
+) {
+  const info = (message) =>
+    logger.info(`${owner}/${repo}/${ref}:${sha}: ${message}`)
+
+  // In progress
+  await status.progress(new Date())
+  info('In Progress')
+
+  // Check if exists and get /.clang-format
+  const style = await getStylefile({owner, repo, ref}, repos, info)
+
+  // Get changed files
+  const files = await getFiles({git,pulls}, {
+    owner,
+    repo,
+    pull_number,
+  })
+  const filenames = files.reduce((acc, {filename}) => `${acc}${filename},`, '')
+  info(`Got PR's changed files : ${filenames}`)
+
+  // Run formatter
+  const changedFiles = await formatter(files, style)
+  info('Formatted')
+
+  // If files touched -> check status annotations
+  if (changedFiles.length > 0) {
+    const annotations = []
+
+    await status.error(annotations)
+  }
+  else {
+    info('No files touched')
+    await status.success()
+  }
+  info('Completed')
+}
+
+module.exports = {
+  lint,
+  format,
+}

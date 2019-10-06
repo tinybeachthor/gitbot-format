@@ -1,7 +1,7 @@
 const logger = require('./logger')
 
 const Status = require('./status')
-const format = require('./format')
+const { format, lint } = require('./format')
 
 function Queue() {
   const queue = []
@@ -36,10 +36,11 @@ function handle(action, pr_info, github, status) {
         await format(pr_info, github, status)
         break
       case actions.LINT:
+        await lint(pr_info, github, status)
         break
     }
 
-    logger.info(`${action}:${owner}/${repo}/${$ref}:${sha} Handled`)
+    logger.info(`${action}:${owner}/${repo}/${ref}:${sha} Handled`)
   }
 
   queue.place(task)

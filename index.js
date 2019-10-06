@@ -17,7 +17,7 @@ module.exports = async bot => {
     const {owner, repo, number} = context.issue()
     const {sha, ref} = context.payload.pull_request.head
 
-    await enqueue(actions.FORMAT, {
+    await enqueue(actions.LINT, {
       owner,
       repo,
       pull_number: number,
@@ -77,7 +77,7 @@ async function recheckOpened(bot) {
 
       prsResponse.data.forEach((pr) => {
         // enqueue for checking
-        enqueue(actions.FORMAT, {
+        enqueue(actions.LINT, {
           owner: owner.login,
           repo: name,
           pull_number: pr.number,
