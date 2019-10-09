@@ -26,6 +26,7 @@ Making it easy to restart/upgrade/migrate/manage the deployment.
 ## Changelog
 |version|changes|
 |---|---|
+|0.3.1|Pass -assume-filename to clang-format|
 |0.3.0|Format on action, lint by default|
 |---|---|
 |0.2.3|Set queued status as soon as possible|
