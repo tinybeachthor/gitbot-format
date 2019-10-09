@@ -13,7 +13,7 @@ module.exports = async (files, style) => {
       return extensions.includes(path.extname(filename))
     })
     .forEach(({ filename, content }) => {
-      const promise = clangFormat(content, style)
+      const promise = clangFormat(filename, content, style)
         .then((transformed) => {
           return {
             filename,

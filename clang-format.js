@@ -1,12 +1,15 @@
 const {spawn} = require('child_process')
 
-module.exports = (content, style) => {
+module.exports = (filename, content, style) => {
   return new Promise((resolve, reject) => {
 
     const formattedStyle = Buffer.from(style ? style : 'Google')
 
     // spawn process
-    const options = ["-style="+formattedStyle.toString('utf8')]
+    const options = [
+      "-assume-filename="+filename,
+      "-style="+formattedStyle.toString('utf8')
+    ]
     const format = spawn('clang-format', options)
 
     // wait for output
