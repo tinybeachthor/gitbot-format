@@ -4,18 +4,18 @@ module.exports = (checks, statusInfo) => {
   const sha = statusInfo.head_sha
 
   const successGifs = [
-    'i.imgur.com/xS6ZYWn.gif',
-    'i.imgur.com/xAIRmOG.gif',
-    'i.imgur.com/5B9jzkX.gif',
-    'i.imgur.com/CQoRHRT.gif',
-    'i.imgur.com/ZDdXOVR.gif',
-    'i.imgur.com/MGWv2GK.gif',
-    'i.imgur.com/XbFqF55.gif',
-    'i.imgur.com/vWpBm6U.gif',
-    'i.imgur.com/ymknBjY.gif',
-    'i.imgur.com/MSs0DLT.gif',
-    'i.imgur.com/JbrXIMG.gif',
-    'i.imgur.com/oJqCQbw.gif',
+    'https://imgur.com/xS6ZYWn.gif',
+    'https://imgur.com/xAIRmOG.gif',
+    'https://imgur.com/5B9jzkX.gif',
+    'https://imgur.com/CQoRHRT.gif',
+    'https://imgur.com/ZDdXOVR.gif',
+    'https://imgur.com/MGWv2GK.gif',
+    'https://imgur.com/XbFqF55.gif',
+    'https://imgur.com/vWpBm6U.gif',
+    'https://imgur.com/ymknBjY.gif',
+    'https://imgur.com/MSs0DLT.gif',
+    'https://imgur.com/JbrXIMG.gif',
+    'https://imgur.com/oJqCQbw.gif',
   ]
   successGifs.getForSha = function getForSha(hash) {
     function hash2number(hash) {
@@ -77,6 +77,8 @@ module.exports = (checks, statusInfo) => {
   }
 
   function success () {
+    console.log(successGifs.getForSha(sha))
+
     return checks.create({
       ...statusInfo,
       status: "completed",
