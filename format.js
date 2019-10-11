@@ -184,8 +184,8 @@ async function lint(
 
   // If files touched -> check status annotations
   if (changedFiles.length > 0) {
-    const annotations = generateAnnotation(changedFiles, files)
-    await status.failure(annotations)
+    const {annotations, lines} = generateAnnotation(changedFiles, files)
+    await status.failure(annotations, lines)
   }
   else {
     info('No files touched')
@@ -203,6 +203,7 @@ function generateAnnotation(changedFiles, files) {
   }
 
   const annotations = []
+  let touchedLines = 0
   changedFiles.forEach(({filename, content}) => {
     original = findFile(filename)
     if (original) {
@@ -213,13 +214,18 @@ function generateAnnotation(changedFiles, files) {
           start_line: oldStart,
           end_line: oldStart + oldLines,
           annotation_level: 'failure',
-          message: `Lines ${oldStart}:${oldStart+oldLines} need formatting.`,
+          message: `Lines ${oldStart}-${oldStart+oldLines} need formatting.`,
         }
         annotations.push(annotation)
+        touchedLines += oldLines
       })
     }
   })
-  return annotations
+
+  return {
+    annotations,
+    lines: touchedLines,
+  }
 }
 
 module.exports = {

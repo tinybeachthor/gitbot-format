@@ -68,16 +68,16 @@ module.exports = (checks, statusInfo) => {
     })
   }
 
-  function failure (annotations) {
+  function failure (annotations, lines) {
     return checks.create({
       ...statusInfo,
       status: "completed",
       started_at,
       completed_at: new Date(),
-      conclusion: "failure",
+      conclusion: "action_required",
       output: {
-        title,
-        summary: `That's some nasty code.`,
+        title: `${lines} lines need formatting`,
+        summary: `That's some nasty code.\nShowing first 50 formatting issues.`,
         annotations: annotations.slice(0, 50), // 50 at a time limit
       },
       actions: [
