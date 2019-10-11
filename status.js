@@ -78,7 +78,7 @@ module.exports = (checks, statusInfo) => {
       output: {
         title,
         summary: `That's some nasty code.`,
-        annotations,
+        annotations: annotations.slice(0, 50), // 50 at a time limit
       },
       actions: [
         {
@@ -91,8 +91,6 @@ module.exports = (checks, statusInfo) => {
   }
 
   function success () {
-    console.log(successGifs.getForSha(sha))
-
     return checks.create({
       ...statusInfo,
       status: "completed",
