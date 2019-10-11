@@ -1,6 +1,4 @@
-async function getFiles (github, pr) {
-  const { pulls, git } = github
-
+async function getFiles ({pulls, git}, pr) {
   // get PR changed files
   const response = await pulls.listFiles(pr)
 

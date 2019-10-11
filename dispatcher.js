@@ -31,16 +31,21 @@ function handle(action, pr_info, github, status) {
   const task = async () => {
     logger.info(`${action}:${owner}/${repo}/${ref}:${sha} Handling`)
 
-    switch (action) {
-      case actions.FORMAT:
-        await format(pr_info, github, status)
-        break
-      case actions.LINT:
-        await lint(pr_info, github, status)
-        break
+    try {
+      switch (action) {
+        case actions.FORMAT:
+          await format(pr_info, github, status)
+          break
+        case actions.LINT:
+          await lint(pr_info, github, status)
+          break
+      }
+      logger.info(`${action}:${owner}/${repo}/${ref}:${sha} Handled`)
     }
-
-    logger.info(`${action}:${owner}/${repo}/${ref}:${sha} Handled`)
+    catch (err) {
+      logger.error(`${action}:${owner}/${repo}/${ref}:${sha} Errored : ${err}`)
+      status.error(err)
+    }
   }
 
   queue.place(task)
