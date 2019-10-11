@@ -29,6 +29,20 @@ module.exports = (checks, statusInfo) => {
 
   let started_at = new Date()
 
+  function error (error) {
+    return checks.create({
+      ...statusInfo,
+      status: "completed",
+      started_at,
+      completed_at: new Date(),
+      conclusion: "failure",
+      output: {
+        title,
+        summary: `Error occurred : ${error}`,
+      },
+    })
+  }
+
   function queued () {
     return checks.create({
       ...statusInfo,
@@ -54,7 +68,7 @@ module.exports = (checks, statusInfo) => {
     })
   }
 
-  function error (annotations) {
+  function failure (annotations) {
     return checks.create({
       ...statusInfo,
       status: "completed",
@@ -99,9 +113,11 @@ module.exports = (checks, statusInfo) => {
   }
 
   return {
+    error,
+
     queued,
     progress,
-    error,
+    failure,
     success,
   }
 }

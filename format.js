@@ -185,7 +185,7 @@ async function lint(
   // If files touched -> check status annotations
   if (changedFiles.length > 0) {
     const annotations = generateAnnotation(changedFiles, files)
-    await status.error(annotations)
+    await status.failure(annotations)
   }
   else {
     info('No files touched')
