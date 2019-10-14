@@ -44,6 +44,22 @@ module.exports = async bot => {
   }
   bot.on("check_run.requested_action", requestedFormat)
 
+  // Check rerun
+  const rerunCheck = async (context) => {
+    const {owner, repo} = context.issue()
+    const {head_branch, head_sha} = context.payload.check_run.check_suite
+    const pull_number = context.payload.check_run.check_suite.pull_requests[0].number
+
+    await enqueue(actions.LINT, {
+      owner,
+      repo,
+      pull_number,
+      sha: head_sha,
+      ref: head_branch,
+    }, context.github)
+  }
+  bot.on("check_run.rerequested", rerunCheck)
+
   // Rerun on all opened PRs
   await recheckOpened(bot)
 
