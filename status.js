@@ -1,6 +1,5 @@
 module.exports = (checks, statusInfo) => {
 
-  const title = statusInfo.name
   const sha = statusInfo.head_sha
 
   const successGifs = [
@@ -37,7 +36,7 @@ module.exports = (checks, statusInfo) => {
       completed_at: new Date(),
       conclusion: "failure",
       output: {
-        title,
+        title: 'Error',
         summary: `Error occurred : ${error}`,
       },
     })
@@ -48,9 +47,8 @@ module.exports = (checks, statusInfo) => {
       ...statusInfo,
       status: "queued",
       output: {
-        title,
-        summary: 'Queued...'
-      }
+        title: 'Queued...',
+      },
     })
   }
 
@@ -62,9 +60,8 @@ module.exports = (checks, statusInfo) => {
       status: "in_progress",
       started_at,
       output: {
-        title,
-        summary: 'Formatting...'
-      }
+        title: 'Formatting...',
+      },
     })
   }
 
@@ -98,8 +95,8 @@ module.exports = (checks, statusInfo) => {
       completed_at: new Date(),
       conclusion: "success",
       output: {
-        title,
-        summary: 'Formatted all right!',
+        title: 'Format all right!',
+        summary: 'Beautiful code right there!',
         images: [
           {
             alt: 'celebration',
