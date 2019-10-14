@@ -102,6 +102,9 @@ async function format(
         .then(({data}) => {
           return { sha: data.sha, filename }
         })
+
+      info(`Create blob for: ${filename}`)
+
       blobsPromises.push(promise)
     })
     const blobs = await Promise.all(blobsPromises)
