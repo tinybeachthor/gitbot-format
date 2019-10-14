@@ -21,10 +21,26 @@ async function getFiles ({pulls, git}, pr) {
       })
 
     // push promise
-    promises.push(promise)
+    promises.push(promise
+      .catch(e => {
+        return {
+          filename,
+          exception: e,
+        }
+      }))
   })
 
   // all file downloads
-  return Promise.all(promises)
+  const finished = await Promise.all(promises)
+
+  const resolved = finished
+    .filter(x => !(x instanceof Error))
+  const errored = finished
+    .filter(x => (x instanceof Error))
+
+  return {
+    resolved,
+    errored,
+  }
 }
 module.exports = getFiles

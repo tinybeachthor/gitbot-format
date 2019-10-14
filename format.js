@@ -80,11 +80,13 @@ async function format(
     repo,
     pull_number,
   })
-  const filenames = files.reduce((acc, {filename}) => `${acc}${filename};`, '')
+  const filenames = files.resolved.reduce((acc, {filename}) => `${acc}${filename};`, '')
   info(`Got PR's changed files : ${filenames}`)
+  const filenamesErrored = files.errored.reduce((acc, {filename}) => `${acc}${filename};`, '')
+  filenamesErrored.length && info(`Couldn't get PR files : ${filenamesErrored}`)
 
   // Run formatter
-  const changedFiles = await formatter(files, style)
+  const changedFiles = await formatter(files.resolved, style)
   info('Formatted')
 
   // If changed -> push blobs + create tree + create commit
@@ -178,16 +180,18 @@ async function lint(
     repo,
     pull_number,
   })
-  const filenames = files.reduce((acc, {filename}) => `${acc}${filename};`, '')
+  const filenames = files.resolved.reduce((acc, {filename}) => `${acc}${filename};`, '')
   info(`Got PR's changed files : ${filenames}`)
+  const filenamesErrored = files.errored.reduce((acc, {filename}) => `${acc}${filename};`, '')
+  filenamesErrored.length && info(`Couldn't get PR files : ${filenamesErrored}`)
 
   // Run formatter
-  const changedFiles = await formatter(files, style)
+  const changedFiles = await formatter(files.resolved, style)
   info('Formatted')
 
   // If files touched -> check status annotations
   if (changedFiles.length > 0) {
-    const {annotations, lines} = generateAnnotation(changedFiles, files)
+    const {annotations, lines} = generateAnnotation(changedFiles, files.resolved)
     await status.failure(annotations, lines)
   }
   else {
