@@ -1,63 +1,8 @@
 const logger = require('./logger')
 const util = require('util')
 
-const { structuredPatch } = require('diff')
-const yaml = require('js-yaml')
-
-const getFiles = require('./getFiles')
 const formatter = require('./formatter')
-
-const stylefileName = '.clang-format'
-
-async function getStylefile({owner, repo, ref}, repos, info) {
-  // try getting stylefile from default branch (master) first
-  try {
-    const stylefileResponse = await repos.getContents({
-      owner,
-      repo,
-      path: stylefileName,
-    })
-    const buffer = Buffer.from(stylefileResponse.data.content, 'base64')
-    const text = buffer.toString('utf8')
-
-    // flatten YAML docs into single and convert YAML to JSON
-    const json = JSON.stringify(yaml.safeLoadAll(text).reduce((acc, doc) => {
-      Object.keys(doc).forEach((key) => acc[key] = doc[key])
-      return acc
-    }), {})
-
-    info(`Got stylefile from default branch : ${json}`)
-    return json
-  }
-  // try getting stylefile from current branch
-  catch (e) {
-    info('Could not get stylefile from default branch, trying PR branch.')
-    try {
-      const stylefileResponse = await repos.getContents({
-        owner,
-        repo,
-        path: stylefileName,
-        ref,
-      })
-      const buffer = Buffer.from(stylefileResponse.data.content, 'base64')
-      const text = buffer.toString('utf8')
-
-      // flatten YAML docs into single and convert YAML to JSON
-      const json = JSON.stringify(yaml.safeLoadAll(text).reduce((acc, doc) => {
-        Object.keys(doc).forEach((key) => acc[key] = doc[key])
-        return acc
-      }), {})
-
-      info(`Got stylefile from PR branch : ${json}`)
-      return json
-    }
-    // no stylefile anywhere, use default styling
-    catch (e) {
-      info('Could not get stylefile, falling back to defaults.')
-      return null
-    }
-  }
-}
+const { getStylefile, getFiles, generateAnnotation } = require('./hub')
 
 async function format(
   {owner, repo, pull_number, sha, ref},
@@ -199,40 +144,6 @@ async function lint(
     await status.success()
   }
   info('Completed')
-}
-
-function generateAnnotation(changedFiles, files) {
-  function findFile(filename) {
-    for (const file of files) {
-      if (filename === file.filename) return file
-    }
-    return null
-  }
-
-  const annotations = []
-  let touchedLines = 0
-  changedFiles.forEach(({filename, content}) => {
-    original = findFile(filename)
-    if (original) {
-      diff = structuredPatch(filename, filename, original.content, content)
-      diff.hunks.forEach(({oldStart, oldLines}) => {
-        const annotation = {
-          path: filename,
-          start_line: oldStart,
-          end_line: oldStart + oldLines,
-          annotation_level: 'failure',
-          message: `Lines ${oldStart}-${oldStart+oldLines} need formatting.`,
-        }
-        annotations.push(annotation)
-        touchedLines += oldLines
-      })
-    }
-  })
-
-  return {
-    annotations,
-    lines: touchedLines,
-  }
 }
 
 module.exports = {
