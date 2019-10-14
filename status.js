@@ -48,6 +48,7 @@ module.exports = (checks, statusInfo) => {
       status: "queued",
       output: {
         title: 'Queued...',
+        summary: 'Waiting to run',
       },
     })
   }
@@ -61,6 +62,7 @@ module.exports = (checks, statusInfo) => {
       started_at,
       output: {
         title: 'Formatting...',
+        summary: 'Running the job',
       },
     })
   }

@@ -45,7 +45,7 @@ function handle(action, pr_info, github, status) {
     catch (err) {
       logger.error(`${action}:${owner}/${repo}/${ref}:${sha} Errored : ${err.name}
         ${err.message}
-        ${stack in err ? err.stack : nil}`)
+        ${err.stack ? err.stack : nil}`)
       status.error(err)
     }
   }
