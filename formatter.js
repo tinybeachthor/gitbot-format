@@ -5,15 +5,23 @@ const clangFormat = require('./clang-format')
 const extensions =
   ['.c', '.h', '.cpp', '.hpp', '.C', '.H', '.cc', '.hh', '.cxx', '.hxx']
 
-module.exports = async (files, style) => {
-  const promises = []
+async function asyncForEach(array, callback) {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
+  }
+}
 
-  files
-    .filter(({ filename }) => {
-      return extensions.includes(path.extname(filename))
-    })
-    .forEach(({ filename, content }) => {
-      const promise = clangFormat(filename, content, style)
+module.exports = async (files, style) => {
+  const results = []
+
+  await asyncForEach(
+    files
+      .filter(({ filename }) => {
+        return extensions.includes(path.extname(filename))
+      }),
+    async function callClangFormat({filename, content}) {
+      console.log(`running clang-format for : ${filename}`)
+      const result = await clangFormat(filename, content, style)
         .then((transformed) => {
           return {
             filename,
@@ -21,8 +29,10 @@ module.exports = async (files, style) => {
             touched: transformed != content,
           }
         })
-      promises.push(promise)
-    })
 
-  return Promise.all(promises).then(fs => fs.filter(({touched}) => touched))
+      results.push(result)
+    }
+  )
+
+  return results.filter(({touched}) => touched)
 }
