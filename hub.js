@@ -53,17 +53,41 @@ async function getStylefile({owner, repo, ref}, repos, info) {
   }
 }
 
-async function getFiles ({pulls, git}, pr) {
+async function getPRFileList (pulls, {owner, repo, pull_number}) {
+  let page = 1
+  const files = []
+
+  let gotFiles
+  do {
+    const response = await pulls.listFiles({
+      owner,
+      repo,
+      pull_number,
+      page,
+      per_page: 50,
+    })
+    response.data.forEach(({filename, sha}) => {
+      files.push({filename, sha})
+    })
+
+    gotFiles = response.data.length > 0 ? true : false
+    page++
+  }
+  while (gotFiles)
+
+  return files
+}
+async function getFiles ({pulls, git}, {owner, repo, pull_number}) {
   // get PR changed files
-  const response = await pulls.listFiles(pr)
+  const files = await getPRFileList(pulls, {owner, repo, pull_number})
 
   // download all file blobs
   const promises = []
-  response.data.forEach(({ filename, sha }) => {
+  files.forEach(({ filename, sha }) => {
     const promise = git
       .getBlob({
-        owner: pr.owner,
-        repo: pr.repo,
+        owner,
+        repo,
         file_sha: sha,
       })
       .then(({ data }) => {

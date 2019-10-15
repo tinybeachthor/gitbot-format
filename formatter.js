@@ -20,7 +20,6 @@ module.exports = async (files, style) => {
         return extensions.includes(path.extname(filename))
       }),
     async function callClangFormat({filename, content}) {
-      console.log(`running clang-format for : ${filename}`)
       const result = await clangFormat(filename, content, style)
         .then((transformed) => {
           return {
