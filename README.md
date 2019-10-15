@@ -26,6 +26,8 @@ Making it easy to restart/upgrade/migrate/manage the deployment.
 ## Changelog
 |version|changes|
 |---|---|
+|0.4.0|Page over PR files, handle check reruns, handle getFile failure, sync calls to clang-format, expand logging|
+|---|---|
 |0.3.2|Improve status check (line count, action required). Annotations limit quickfix.|
 |0.3.1|Pass -assume-filename to clang-format|
 |0.3.0|Format on action, lint by default|
