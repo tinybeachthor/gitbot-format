@@ -23,10 +23,7 @@ module.exports = (checks, statusInfo) => {
         .map(c => c.charCodeAt(0))
         .reduce((acc, x) => acc + x, 0)
     }
-    if (hash)
-      return successGifs[hash2number(hash) % successGifs.length]
-    else
-      return successGifs[0]
+    return successGifs[hash2number(hash) % successGifs.length]
   }
 
   let started_at = new Date()

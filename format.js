@@ -2,7 +2,7 @@ const logger = require('./logger')
 const util = require('util')
 
 const formatter = require('./formatter')
-const { getStylefile, getFile, getPRFileList, generateAnnotation }
+const { getStylefile, getPRFileList, getFile, generateAnnotations }
   = require('./hub')
 
 async function asyncForEach(array, callback) {
@@ -135,7 +135,8 @@ async function lint(
 
   // Process files
   skipped_filenames = []
-  changedFiles = []
+  touched_lines = []
+  annotations = []
   await asyncForEach(pr_filenames, async ({filename, sha}) => {
     info(`Processing ${filename}`)
 
@@ -148,16 +149,25 @@ async function lint(
     }
 
     // Format file
-    const changed = await formatter([file], style)
-    changed.length > 0 && changedFiles.push(changed)
+    const [changed] = await formatter([file], style)
+    if (!changed) {
+      return
+    }
+
+    // Generate annotations
+    const file_annotations = generateAnnotations(changed, file)
+
+    touched_lines = Number(file_annotations.lines) + Number(touched_lines)
+    annotations = annotations.concat(file_annotations.annotations)
   })
-  const filenamesErrored = skipped_filenames.reduce((acc, {filename}) => `${acc}${filename};`, '')
+  const filenamesErrored =
+    skipped_filenames.reduce((acc, {filename}) => `${acc}${filename};`, '')
   filenamesErrored.length && info(`Couldn't get PR files : ${filenamesErrored}`)
 
   // If files touched -> check status annotations
-  if (changedFiles.length > 0) {
-    const {annotations, lines} = generateAnnotation(changedFiles, pr_filenames)
-    await status.failure(annotations, lines)
+  if (touched_lines > 0 || annotations.length > 0) {
+    info(`Touuched ${touched_lines} lines`)
+    await status.failure(annotations, touched_lines)
   }
   else {
     info('No files touched')
