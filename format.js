@@ -141,7 +141,7 @@ async function lint(
     info(`Processing ${filename}`)
 
     // Get file
-    const file = await getFile({pulls, git}, {owner, repo, filename, sha})
+    const file = await getFile(git, {owner, repo, filename, sha})
     if (file.exception || !file.content) {
       error(`Error getting ${filename}`)
       skipped_filenames.push(filename)

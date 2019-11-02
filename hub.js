@@ -77,7 +77,7 @@ async function getPRFileList (pulls, {owner, repo, pull_number}) {
 
   return files
 }
-async function getFile ({pulls, git}, {owner, repo, filename, sha}) {
+async function getFile (git, {owner, repo, filename, sha}) {
   return git
     .getBlob({
       owner,
@@ -106,29 +106,7 @@ async function getFiles ({pulls, git}, {owner, repo, pull_number}) {
   // download all file blobs
   const promises = []
   files.forEach(({ filename, sha }) => {
-    const promise = git
-      .getBlob({
-        owner,
-        repo,
-        file_sha: sha,
-      })
-      .then(({ data }) => {
-        const buffer = Buffer.from(data.content, 'base64')
-        const text = buffer.toString('utf8')
-        return {
-          filename,
-          content: text,
-        }
-      })
-
-    // push promise
-    promises.push(promise
-      .catch(e => {
-        return {
-          filename,
-          exception: e,
-        }
-      }))
+    promises.push(getFile(git, {owner, repo, filename, sha}))
   })
 
   // all file downloads
