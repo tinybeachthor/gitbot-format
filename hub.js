@@ -77,6 +77,28 @@ async function getPRFileList (pulls, {owner, repo, pull_number}) {
 
   return files
 }
+async function getFile ({pulls, git}, {owner, repo, filename, sha}) {
+  return git
+    .getBlob({
+      owner,
+      repo,
+      file_sha: sha,
+    })
+    .then(({ data }) => {
+      const buffer = Buffer.from(data.content, 'base64')
+      const text = buffer.toString('utf8')
+      return {
+        filename,
+        content: text,
+      }
+    })
+    .catch(e => {
+      return {
+        filename,
+        exception: e,
+      }
+    })
+}
 async function getFiles ({pulls, git}, {owner, repo, pull_number}) {
   // get PR changed files
   const files = await getPRFileList(pulls, {owner, repo, pull_number})
@@ -123,7 +145,9 @@ async function getFiles ({pulls, git}, {owner, repo, pull_number}) {
   }
 }
 
-function generateAnnotation(changedFiles, files) {
+function generateAnnotation(processed, original) {
+
+
   function findFile(filename) {
     for (const file of files) {
       if (filename === file.filename) return file
@@ -159,6 +183,8 @@ function generateAnnotation(changedFiles, files) {
 
 module.exports = {
   getStylefile,
+  getPRFileList,
+  getFile,
   getFiles,
   generateAnnotation,
 }

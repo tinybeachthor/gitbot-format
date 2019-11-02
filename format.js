@@ -2,7 +2,14 @@ const logger = require('./logger')
 const util = require('util')
 
 const formatter = require('./formatter')
-const { getStylefile, getFiles, generateAnnotation } = require('./hub')
+const { getStylefile, getFile, getPRFileList, generateAnnotation }
+  = require('./hub')
+
+async function asyncForEach(array, callback) {
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
+  }
+}
 
 async function format(
   {owner, repo, pull_number, sha, ref},
@@ -111,6 +118,8 @@ async function lint(
 ) {
   const info = (message) =>
     logger.info(`${owner}/${repo}/${ref}:${sha}: ${message}`)
+  const error = (message) =>
+    logger.error(`${owner}/${repo}/${ref}:${sha}: ${message}`)
 
   // In progress
   await status.progress(new Date())
@@ -119,24 +128,35 @@ async function lint(
   // Check if exists and get /.clang-format
   const style = await getStylefile({owner, repo, ref}, repos, info)
 
-  // Get changed files
-  const files = await getFiles({git,pulls}, {
-    owner,
-    repo,
-    pull_number,
-  })
-  const filenames = files.resolved.reduce((acc, {filename}) => `${acc}${filename};`, '')
+  // Get PR file list
+  pr_filenames = await getPRFileList(pulls, {owner, repo, pull_number})
+  const filenames = pr_filenames.reduce((acc, {filename}) => `${acc}${filename};`, '')
   info(`Got PR's changed files : ${filenames}`)
-  const filenamesErrored = files.errored.reduce((acc, {filename}) => `${acc}${filename};`, '')
-  filenamesErrored.length && info(`Couldn't get PR files : ${filenamesErrored}`)
 
-  // Run formatter
-  const changedFiles = await formatter(files.resolved, style)
-  info('Formatted')
+  // Process files
+  skipped_filenames = []
+  changedFiles = []
+  await asyncForEach(pr_filenames, async ({filename, sha}) => {
+    info(`Processing ${filename}`)
+
+    // Get file
+    const file = await getFile({pulls, git}, {owner, repo, filename, sha})
+    if (file.exception || !file.content) {
+      error(`Error getting ${filename}`)
+      skipped_filenames.push(filename)
+      return
+    }
+
+    // Format file
+    const changed = await formatter([file], style)
+    changed.length > 0 && changedFiles.push(changed)
+  })
+  const filenamesErrored = skipped_filenames.reduce((acc, {filename}) => `${acc}${filename};`, '')
+  filenamesErrored.length && info(`Couldn't get PR files : ${filenamesErrored}`)
 
   // If files touched -> check status annotations
   if (changedFiles.length > 0) {
-    const {annotations, lines} = generateAnnotation(changedFiles, files.resolved)
+    const {annotations, lines} = generateAnnotation(changedFiles, pr_filenames)
     await status.failure(annotations, lines)
   }
   else {
