@@ -77,6 +77,28 @@ async function getPRFileList (pulls, {owner, repo, pull_number}) {
 
   return files
 }
+async function getFile (git, {owner, repo, filename, sha}) {
+  return git
+    .getBlob({
+      owner,
+      repo,
+      file_sha: sha,
+    })
+    .then(({ data }) => {
+      const buffer = Buffer.from(data.content, 'base64')
+      const text = buffer.toString('utf8')
+      return {
+        filename,
+        content: text,
+      }
+    })
+    .catch(e => {
+      return {
+        filename,
+        exception: e,
+      }
+    })
+}
 async function getFiles ({pulls, git}, {owner, repo, pull_number}) {
   // get PR changed files
   const files = await getPRFileList(pulls, {owner, repo, pull_number})
@@ -84,29 +106,7 @@ async function getFiles ({pulls, git}, {owner, repo, pull_number}) {
   // download all file blobs
   const promises = []
   files.forEach(({ filename, sha }) => {
-    const promise = git
-      .getBlob({
-        owner,
-        repo,
-        file_sha: sha,
-      })
-      .then(({ data }) => {
-        const buffer = Buffer.from(data.content, 'base64')
-        const text = buffer.toString('utf8')
-        return {
-          filename,
-          content: text,
-        }
-      })
-
-    // push promise
-    promises.push(promise
-      .catch(e => {
-        return {
-          filename,
-          exception: e,
-        }
-      }))
+    promises.push(getFile(git, {owner, repo, filename, sha}))
   })
 
   // all file downloads
@@ -123,32 +123,21 @@ async function getFiles ({pulls, git}, {owner, repo, pull_number}) {
   }
 }
 
-function generateAnnotation(changedFiles, files) {
-  function findFile(filename) {
-    for (const file of files) {
-      if (filename === file.filename) return file
-    }
-    return null
-  }
-
+function generateAnnotations({ filename, content }, original) {
   const annotations = []
   let touchedLines = 0
-  changedFiles.forEach(({filename, content}) => {
-    original = findFile(filename)
-    if (original) {
-      diff = structuredPatch(filename, filename, original.content, content)
-      diff.hunks.forEach(({oldStart, oldLines}) => {
-        const annotation = {
-          path: filename,
-          start_line: oldStart,
-          end_line: oldStart + oldLines,
-          annotation_level: 'failure',
-          message: `Lines ${oldStart}-${oldStart+oldLines} need formatting.`,
-        }
-        annotations.push(annotation)
-        touchedLines += oldLines
-      })
+
+  const diff = structuredPatch(filename, filename, original.content, content)
+  diff.hunks.forEach(({oldStart, oldLines}) => {
+    const annotation = {
+      path: filename,
+      start_line: oldStart,
+      end_line: oldStart + oldLines,
+      annotation_level: 'failure',
+      message: `Lines ${oldStart}-${oldStart+oldLines} need formatting.`,
     }
+    annotations.push(annotation)
+    touchedLines += oldLines
   })
 
   return {
@@ -159,6 +148,8 @@ function generateAnnotation(changedFiles, files) {
 
 module.exports = {
   getStylefile,
+  getPRFileList,
+  getFile,
   getFiles,
-  generateAnnotation,
+  generateAnnotations,
 }
