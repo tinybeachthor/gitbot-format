@@ -1,5 +1,4 @@
 const logger = require('./logger')
-const util = require('util')
 
 const { enqueue, actions } = require('./dispatcher')
 

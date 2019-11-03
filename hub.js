@@ -99,29 +99,6 @@ async function getFile (git, {owner, repo, filename, sha}) {
       }
     })
 }
-async function getFiles ({pulls, git}, {owner, repo, pull_number}) {
-  // get PR changed files
-  const files = await getPRFileList(pulls, {owner, repo, pull_number})
-
-  // download all file blobs
-  const promises = []
-  files.forEach(({ filename, sha }) => {
-    promises.push(getFile(git, {owner, repo, filename, sha}))
-  })
-
-  // all file downloads
-  const finished = await Promise.all(promises)
-
-  const resolved = finished
-    .filter(x => !(x instanceof Error))
-  const errored = finished
-    .filter(x => (x instanceof Error))
-
-  return {
-    resolved,
-    errored,
-  }
-}
 
 function generateAnnotations({ filename, content }, original) {
   const annotations = []
@@ -150,6 +127,5 @@ module.exports = {
   getStylefile,
   getPRFileList,
   getFile,
-  getFiles,
   generateAnnotations,
 }
