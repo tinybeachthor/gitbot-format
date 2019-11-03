@@ -1,37 +1,53 @@
 const path = require('path')
-
-const clangFormat = require('./clang-format')
+const {spawn} = require('child_process')
 
 const extensions =
   ['.c', '.h', '.cpp', '.hpp', '.C', '.H', '.cc', '.hh', '.cxx', '.hxx']
 
-async function asyncForEach(array, callback) {
-  for (let index = 0; index < array.length; index++) {
-    await callback(array[index], index, array);
+module.exports = async ({filename, content}, style) => {
+  if (!extensions.includes(path.extname(filename))) {
+    return {filename, content, touched: false}
   }
+
+  const transformed = await clangFormat(filename, content, style)
+  return {filename, content: transformed, touched: transformed != content}
 }
 
-module.exports = async (files, style) => {
-  const results = []
+function clangFormat (filename, content, style) {
+  return new Promise((resolve, reject) => {
 
-  await asyncForEach(
-    files
-      .filter(({ filename }) => {
-        return extensions.includes(path.extname(filename))
-      }),
-    async function callClangFormat({filename, content}) {
-      const result = await clangFormat(filename, content, style)
-        .then((transformed) => {
-          return {
-            filename,
-            content: transformed,
-            touched: transformed != content,
-          }
-        })
+    const formattedStyle = Buffer.from(style ? style : 'Google')
 
-      results.push(result)
-    }
-  )
+    // spawn process
+    const options = [
+      "-assume-filename="+filename,
+      "-style="+formattedStyle.toString('utf8')
+    ]
+    const format = spawn('clang-format', options)
 
-  return results.filter(({touched}) => touched)
+    // wait for output
+    let output = ""
+    format.stdout.on('data', data => {
+      output += data
+    })
+
+    // check for errors
+    format.stderr.on('data', data => {
+      reject(data.toString())
+    })
+
+    // resolve on close
+    format.on('close', code => {
+      if (code === 0) {
+        resolve(output)
+      }
+      else {
+        reject(code)
+      }
+    })
+
+    // pipe data
+    format.stdin.write(content)
+    format.stdin.end()
+  })
 }

@@ -113,7 +113,7 @@ async function format(
 
 async function lint(
   {owner, repo, pull_number, sha, ref},
-  {checks, git, pulls, repos},
+  {git, pulls, repos},
   status
 ) {
   const info = (message) =>
@@ -149,13 +149,18 @@ async function lint(
     }
 
     // Format file
-    const [changed] = await formatter([file], style)
-    if (!changed) {
+    const transformed = await formatter([file], style)
+    if (!transformed) {
+      error(`Error transforming ${filename}`)
+      skipped_filenames.push(filename)
+      return
+    }
+    if (!transformed.touched) {
       return
     }
 
     // Generate annotations
-    const file_annotations = generateAnnotations(changed, file)
+    const file_annotations = generateAnnotations(transformed, file)
 
     touched_lines = Number(file_annotations.lines) + Number(touched_lines)
     annotations = annotations.concat(file_annotations.annotations)
@@ -166,7 +171,7 @@ async function lint(
 
   // If files touched -> check status annotations
   if (touched_lines > 0 || annotations.length > 0) {
-    info(`Touuched ${touched_lines} lines`)
+    info(`Touched ${touched_lines} lines`)
     await status.failure(annotations, touched_lines)
   }
   else {
