@@ -69,7 +69,7 @@ module.exports = (checks, statusInfo) => {
 
   function failure (annotations, lines, skipped) {
     const skipped_filenames = skipped.reduce((acc, filename) => `${acc}${filename};`, '')
-    const skipped_report = skipped_filenames !== '' ? `\n\nFailed to get/process following files: ${skipped_filenames}` : ''
+    const skipped_report = skipped_filenames !== '' ? `\n\nFailed to get/process following files:\n${skipped_filenames}` : ''
     return checks.create({
       ...statusInfo,
       status: "completed",
@@ -100,7 +100,7 @@ module.exports = (checks, statusInfo) => {
       completed_at: new Date(),
       conclusion: "neutral",
       output: {
-        title: `${skipped.length} files skipped.`,
+        title: `${skipped.length} file(s) skipped.`,
         summary: `Failed to get/process following files:\n${filenames}`,
       },
     })
