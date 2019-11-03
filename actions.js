@@ -192,7 +192,7 @@ async function lint(
     info(`Touched ${touched_lines} lines`)
     await status.failure(annotations, touched_lines, skipped_filenames)
   }
-  else if (skipped_filenames.length >= 0) {
+  else if (skipped_filenames.length > 0) {
     info (`Skipped ${skipped_filenames.length} files`)
     await status.warningSkipped(skipped_filenames)
   }
