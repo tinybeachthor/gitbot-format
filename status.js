@@ -67,7 +67,9 @@ module.exports = (checks, statusInfo) => {
     })
   }
 
-  function failure (annotations, lines) {
+  function failure (annotations, lines, skipped) {
+    const skipped_filenames = skipped.reduce((acc, filename) => `${acc}${filename};`, '')
+    const skipped_report = skipped_filenames !== '' ? `\n\nFailed to get/process following files: ${skipped_filenames}` : ''
     return checks.create({
       ...statusInfo,
       status: "completed",
@@ -76,7 +78,7 @@ module.exports = (checks, statusInfo) => {
       conclusion: "action_required",
       output: {
         title: `${lines} lines need formatting`,
-        summary: `That's some nasty code.\nShowing first 50 formatting issues.`,
+        summary: `Showing first 50 formatting issues.` + skipped_report,
         annotations: annotations.slice(0, 50), // 50 at a time limit
       },
       actions: [
@@ -89,6 +91,20 @@ module.exports = (checks, statusInfo) => {
     })
   }
 
+  function warningSkipped (skipped) {
+    const filenames = skipped.reduce((acc, filename) => `${acc}${filename};`, '')
+    return checks.create({
+      ...statusInfo,
+      status: "completed",
+      started_at,
+      completed_at: new Date(),
+      conclusion: "neutral",
+      output: {
+        title: `${skipped.length} files skipped.`,
+        summary: `Failed to get/process following files:\n${filenames}`,
+      },
+    })
+  }
   function success () {
     return checks.create({
       ...statusInfo,
@@ -115,6 +131,7 @@ module.exports = (checks, statusInfo) => {
     queued,
     progress,
     failure,
+    warningSkipped,
     success,
   }
 }

@@ -64,7 +64,7 @@ async function format(
       .createBlob({
         owner,
         repo,
-        transformed.content,
+        content: transformed.content,
         encoding: "utf-8",
       })
       .then(({data}) => { sha: data.sha, filename })
@@ -78,7 +78,7 @@ async function format(
     pushed_blobs.push(blob)
   })
   const filenamesErrored =
-    skipped_filenames.reduce((acc, {filename}) => `${acc}${filename};`, '')
+    skipped_filenames.reduce((acc, filename) => `${acc}${filename};`, '')
   filenamesErrored.length && info(`Couldn't get PR files : ${filenamesErrored}`)
 
   // create tree
@@ -120,7 +120,12 @@ async function format(
   info('Updated ref')
 
   // Completed
-  await status.success()
+  if (skipped_filenames.length > 0) {
+    await status.warningSkipped(skipped_filenames)
+  }
+  else {
+    await status.success()
+  }
   info('Completed')
 }
 
@@ -179,13 +184,17 @@ async function lint(
     annotations = annotations.concat(file_annotations.annotations)
   })
   const filenamesErrored =
-    skipped_filenames.reduce((acc, {filename}) => `${acc}${filename};`, '')
+    skipped_filenames.reduce((acc, filename) => `${acc}${filename};`, '')
   filenamesErrored.length && info(`Couldn't get PR files : ${filenamesErrored}`)
 
   // If files touched -> check status annotations
   if (touched_lines > 0 || annotations.length > 0) {
     info(`Touched ${touched_lines} lines`)
-    await status.failure(annotations, touched_lines)
+    await status.failure(annotations, touched_lines, skipped_filenames)
+  }
+  else if (skipped_filenames.length >= 0) {
+    info (`Skipped ${skipped_filenames.length} files`)
+    await status.warningSkipped(skipped_filenames)
   }
   else {
     info('No files touched')
