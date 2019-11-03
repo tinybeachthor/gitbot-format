@@ -1,6 +1,5 @@
-const logger = require('./logger')
-
-const { enqueue, actions } = require('./dispatcher')
+const logger = require('./lib/logger')
+const { enqueue, actions } = require('./lib/dispatcher')
 
 const Octokit = require("@octokit/rest")
 
