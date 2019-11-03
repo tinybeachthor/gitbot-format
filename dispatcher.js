@@ -1,7 +1,7 @@
 const logger = require('./logger')
 
 const Status = require('./status')
-const { format, lint } = require('./format')
+const { format, lint } = require('./actions')
 
 function Queue() {
   const queue = []
