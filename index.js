@@ -58,8 +58,10 @@ module.exports = async bot => {
   }
   bot.on("check_run.rerequested", rerunCheck)
 
-  // Rerun on all opened PRs
-  await recheckOpened(bot)
+  if (!process.env.NO_RERUN_ON_RESTART || process.env.NO_RERUN_ON_RESTART !== 'true') {
+    // Rerun on all opened PRs
+    await recheckOpened(bot)
+  }
 
   logger.info('bot started up')
 
