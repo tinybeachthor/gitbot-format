@@ -89,8 +89,9 @@ async function recheckOpened(bot) {
       auth: installTokenResponse.data.token,
     })
 
-    const reposResponse = await octokitIT.apps.listRepos()
-    reposResponse.data.repositories.forEach(async ({ name, owner }) => {
+    const listReposPaginate = octokitIT.apps.listRepos.endpoint.merge()
+    const reposResponse = await octokitIT.paginate(listReposPaginate)
+    reposResponse.forEach(async ({ name, owner }) => {
       const prsResponse = await octokitIT.pulls.list({
         owner: owner.login,
         repo: name,
