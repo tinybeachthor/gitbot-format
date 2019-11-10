@@ -92,13 +92,14 @@ async function recheckOpened(bot) {
     const listReposPaginate = octokitIT.apps.listRepos.endpoint.merge()
     const reposResponse = await octokitIT.paginate(listReposPaginate)
     reposResponse.forEach(async ({ name, owner }) => {
-      const prsResponse = await octokitIT.pulls.list({
+      const listPullsPaginate = octokitIT.pulls.list.endpoint.merge({
         owner: owner.login,
         repo: name,
         state: 'open',
       })
+      const prsResponse = await octokitIT.paginate(listPullsPaginate)
 
-      prsResponse.data.forEach((pr) => {
+      prsResponse.forEach((pr) => {
         // enqueue for checking
         enqueue(actions.LINT, {
           owner: owner.login,
