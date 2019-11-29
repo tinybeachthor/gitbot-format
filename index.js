@@ -3,6 +3,8 @@ const { enqueue, actions } = require('./lib/dispatcher')
 
 const Octokit = require("@octokit/rest")
 
+const util = require('util')
+
 /**
  * This is the main entrypoint to your Probot app
  * @param {import('probot').Application} app
@@ -57,6 +59,13 @@ module.exports = async bot => {
     }, context.github)
   }
   bot.on("check_run.rerequested", rerunCheck)
+
+  // Listen to `/format please` in a comment box for an Issue or Pull Request
+  const newComment = async (context) => {
+    console.log('comment')
+    console.log(util.inspect(context))
+  }
+  bot.on("issue_comment.created", newComment)
 
   // Rerun on all opened PRs
   await recheckOpened(bot)
