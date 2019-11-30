@@ -26,6 +26,8 @@ Making it easy to restart/upgrade/migrate/manage the deployment.
 ## Changelog
 |version|changes|
 |---|---|
+|0.6.0|Use git for diff generation, Fix for many large files, Major stability improvements|
+|---|---|
 |0.5.2|Fix non-final formatting, improve skipped files display in checks|
 |0.5.1|Paginate app's installations, paginate repo's PRs|
 |0.5.0|Stream process PR files to reduce memory usage|
