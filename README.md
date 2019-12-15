@@ -26,6 +26,7 @@ Making it easy to restart/upgrade/migrate/manage the deployment.
 ## Changelog
 |version|changes|
 |---|---|
+|0.6.1|Fix annotations duplication bug|
 |0.6.0|Use git for diff generation, Fix for many large files, Major stability improvements|
 |---|---|
 |0.5.2|Fix non-final formatting, improve skipped files display in checks|
