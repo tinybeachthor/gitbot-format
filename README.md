@@ -28,6 +28,8 @@ Making it easy to restart/upgrade/migrate/manage the deployment.
 ## Changelog
 |version|changes|
 |---|---|
+|0.7.0|Don't warn about skipped submodules dirs, remove faulty gifs|
+|---|---|
 |0.6.3|Add gifs for failure + more success gifs|
 |0.6.2|Add more success gifs|
 |0.6.1|Fix annotations duplication bug|
