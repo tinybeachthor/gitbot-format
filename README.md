@@ -53,5 +53,5 @@ Making it easy to restart/upgrade/migrate/manage the deployment.
 |0.1.0|MVP|
 
 ## License
-[ISC](LICENSE) © 2019 Martin Toman <whomenope@outlook.com>
+[ISC](LICENSE) © 2020 Martin Toman <whomenope@outlook.com>
 
