@@ -42,6 +42,9 @@
     ]
   },
   "jest": {
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "modulePaths": [
+      "lib"
+    ]
   }
 }
