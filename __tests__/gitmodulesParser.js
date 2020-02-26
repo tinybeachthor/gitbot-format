@@ -14,12 +14,12 @@ test('parses multiple submodules', () => {
     'dir1/dir2/b',
   ]
 
-  expect(parser.parsePaths(gitmodules)).toBe(expected)
+  expect(parser.parsePaths(gitmodules)).toEqual(expected)
 })
 
 test('parses empty submodules', () => {
   const gitmodules = ''
   const expected = []
 
-  expect(parser.parsePaths(gitmodules)).toBe(expected)
+  expect(parser.parsePaths(gitmodules)).toEqual(expected)
 })
