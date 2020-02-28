@@ -1,5 +1,3 @@
-DEPRECATED - see [clang-format-action](https://github.com/WhoMeNope/clang-format-action)
-
 # gitbot-format
 A GitHub App using the [Probot](https://github.com/probot/probot) framework
 
