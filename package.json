@@ -13,6 +13,7 @@
     "probot-app"
   ],
   "scripts": {
+    "build": "tsc",
     "dev": "nodemon",
     "start": "probot run ./index.js",
     "test": "jest",
