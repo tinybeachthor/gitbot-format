@@ -4,13 +4,13 @@ const formatFile = require('./format')
 const { getGitmodules, getStylefile, getPRFileList, getFile } = require('./hub')
 const { generateAnnotations } = require('./diff')
 
-async function asyncForEach(array, callback) {
+async function asyncForEach (array, callback) {
   for (let index = 0; index < array.length; index++) {
     await callback(array[index], index, array);
   }
 }
 
-async function format(
+export async function format (
   {owner, repo, pull_number, sha, ref},
   {git, pulls, repos},
   status
@@ -139,7 +139,7 @@ async function format(
   info('Completed')
 }
 
-async function lint(
+export async function lint(
   {owner, repo, pull_number, sha, ref},
   {git, pulls, repos},
   status
@@ -224,9 +224,4 @@ async function lint(
     await status.success()
   }
   info('Completed')
-}
-
-module.exports = {
-  lint,
-  format,
 }

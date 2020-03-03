@@ -1,32 +1,44 @@
-const logger = require('./logger')
+import logger from './logger'
+import Status from './status'
+import { format, lint } from './actions'
 
-const Status = require('./status')
-const { format, lint } = require('./actions')
+type Task = () => Promise<void>
+interface TaskQueue {
+  place(task: Task): void
+  next(): Promise<void>
+  active: boolean
+}
 
-function Queue() {
-  const queue = []
-  queue.active = false
+function makeQueue(): TaskQueue {
+  const queue: Task[] = []
+  let active = false
 
-  queue.place = function (command) {
-    queue.push(command)
-    if (!queue.active) queue.next()
+  function place (task: Task): void {
+    queue.push(task)
+    active || next()
   }
-  queue.next = async function () {
+  async function next (): Promise<void> {
     if (!queue.length) {
-      queue.active = false
+      active = false
       return
     }
-    var command = queue.shift()
-    queue.active = true
-    await command()
-    queue.next()
+    active = true
+    const task = queue.shift()
+    task && await task()
+    next()
   }
-  return queue
-}
-const queue = Queue()
 
-function handle(action, pr_info, github, status) {
-  const {owner, repo, pull_number, sha, ref} = pr_info
+  return {
+    place,
+    next,
+    active,
+  }
+}
+
+const queue = makeQueue()
+
+function handle(action: string, pr_info, github: any, status) {
+  const {owner, repo, sha, ref} = pr_info
 
   const task = async () => {
     logger.info(`${action}:${owner}/${repo}/${ref}:${sha} Handling`)
@@ -52,7 +64,7 @@ function handle(action, pr_info, github, status) {
   queue.place(task)
 }
 
-async function enqueue(action, pr_info, github) {
+async function enqueue(action: string, pr_info, github: any) {
   const {owner, repo, pull_number, sha, ref} = pr_info
 
   // PR status check

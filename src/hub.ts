@@ -1,5 +1,5 @@
-const yaml = require('js-yaml')
-const gitmodulesParser = require('./gitmodulesParser')
+import yaml from 'js-yaml'
+import gitmodulesParser from './gitmodulesParser'
 
 async function getGitmodules({owner, repo, ref}, repos, info) {
   const gitmodulesFilename = '.gitmodules'
