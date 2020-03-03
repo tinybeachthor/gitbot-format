@@ -30,4 +30,5 @@ if (process.env.LOG_FILE === 'true') {
 }
 
 logger.info('logger started up')
-module.exports = logger
+
+export default logger
