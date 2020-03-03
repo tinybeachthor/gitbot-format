@@ -1,10 +1,13 @@
-const path = require('path')
-const { spawn } = require('child_process')
-const tempWrite = require('temp-write')
-const fs = require('fs')
+import fs from 'fs'
+import path from 'path'
+import { spawn } from 'child_process'
+import tempWrite from 'temp-write'
+
+import { SpawnOptions } from 'child_process'
+import { PatchRange, Annotations, AnnotationLevel } from './types.d'
 
 // '@@ -6,10 +6,9 @@ int checkEvenOrOdd() {' => {6, 10, 6, 9}
-function parsePatchHeader (header) {
+function parsePatchHeader (header: string): PatchRange {
   const lineStats = (header.split('@@')[1]).split(' ')
   const originalStats = lineStats[1].substr(1).split(',')
   const editedStats = lineStats[2].substr(1).split(',')
@@ -17,18 +20,22 @@ function parsePatchHeader (header) {
   }
 }
 
-function spawnAndGet (command, args, options) {
+async function spawnAndGet (
+  command: string,
+  args: string[],
+  options: SpawnOptions
+) : Promise<string> {
   const p = spawn(command, args, options)
 
   return new Promise((resolve, reject) => {
     // wait for output
     let output = ""
-    p.stdout.on('data', data => {
+    p.stdout && p.stdout.on('data', data => {
       output += data
     })
 
     // check for errors
-    p.stderr.on('data', data => {
+    p.stderr && p.stderr.on('data', data => {
       reject(data.toString())
     })
 
@@ -68,18 +75,17 @@ async function generateDiff (edited, original) {
   }
 }
 
-async function generateAnnotations (edited, original) {
+async function generateAnnotations (edited, original): Promise<Annotations> {
   const hunks = await generateDiff(edited, original)
 
-  return hunks.reduce(({annotations, lines}, {oldStart, oldLines}) => {
+  return hunks.reduce(({annotations, lines}: Annotations, {oldStart, oldLines}: PatchRange) => {
     annotations.push({
       path: original.filename,
       start_line: oldStart,
       end_line: oldStart + oldLines,
-      annotation_level: 'failure',
+      annotation_level: AnnotationLevel.Failure,
       message: `Lines ${oldStart}-${oldStart+oldLines} need formatting.`,
     })
-
     return {
       annotations,
       lines: lines + oldLines,
@@ -90,6 +96,6 @@ async function generateAnnotations (edited, original) {
   })
 }
 
-module.exports = {
-  generateAnnotations,
+export default {
+  generateAnnotations
 }
