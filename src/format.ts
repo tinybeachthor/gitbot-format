@@ -8,7 +8,10 @@ import { File } from './types.d'
 const extensions =
   ['.c', '.h', '.cpp', '.hpp', '.C', '.H', '.cc', '.hh', '.cxx', '.hxx']
 
-export default async ({filename, content}: File, style: string) => {
+export default async function formatFile (
+  {filename, content}: File,
+  style: string | null
+) {
   if (!extensions.includes(path.extname(filename))) {
     return {filename, content, touched: false}
   }
@@ -21,7 +24,11 @@ export default async ({filename, content}: File, style: string) => {
   }
 }
 
-async function clangFormat (filename: string, content: string, style: string) {
+async function clangFormat (
+  filename: string,
+  content: string,
+  style: string | null
+) {
   const formattedStyle = Buffer.from(style ? style : 'Google')
   const options = [
     "-style="+formattedStyle.toString('utf8'),
