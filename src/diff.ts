@@ -4,7 +4,7 @@ import { spawn } from 'child_process'
 import tempWrite from 'temp-write'
 
 import { SpawnOptions } from 'child_process'
-import { PatchRange, Annotations, AnnotationLevel } from './types.d'
+import { PatchRange, Annotations, AnnotationLevel, File } from './types.d'
 
 // '@@ -6,10 +6,9 @@ int checkEvenOrOdd() {' => {6, 10, 6, 9}
 function parsePatchHeader (header: string): PatchRange {
@@ -51,7 +51,7 @@ async function spawnAndGet (
   })
 }
 
-async function generateDiff (edited, original) {
+async function generateDiff (edited: File, original: File) {
   const editedFile = tempWrite.sync(edited.content, path.basename(edited.filename))
   const originalFile = tempWrite.sync(original.content, path.basename(original.filename))
 
@@ -75,7 +75,7 @@ async function generateDiff (edited, original) {
   }
 }
 
-export default async function generateAnnotations (edited, original): Promise<Annotations> {
+export default async function generateAnnotations (edited: File, original: File): Promise<Annotations> {
   const hunks = await generateDiff(edited, original)
 
   return hunks.reduce(({annotations, lines}: Annotations, {oldStart, oldLines}: PatchRange) => {
