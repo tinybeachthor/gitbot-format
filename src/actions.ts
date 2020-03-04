@@ -3,7 +3,7 @@ import formatFile from './format'
 import { getGitmodules, getStylefile, getPRFileList, getFile } from './hub'
 import generateAnnotations from './diff'
 
-import { PullRequestInfo, Annotation } from './types.d'
+import { PullRequestInfo, Annotation, Checkrun } from './types.d'
 
 async function asyncForEach (
   array: any[],
@@ -17,7 +17,7 @@ async function asyncForEach (
 export async function format (
   {owner, repo, pull_number, sha, ref}: PullRequestInfo,
   {git, pulls, repos}: any,
-  status
+  status: Checkrun
 ) {
   const info = (message: string) =>
     logger.info(`${owner}/${repo}/${ref}:${sha}: ${message}`)
@@ -146,7 +146,7 @@ export async function format (
 export async function lint(
   {owner, repo, pull_number, sha, ref}: PullRequestInfo,
   {git, pulls, repos}: any,
-  status
+  status: Checkrun
 ) {
   const info = (message: string) =>
     logger.info(`${owner}/${repo}/${ref}:${sha}: ${message}`)

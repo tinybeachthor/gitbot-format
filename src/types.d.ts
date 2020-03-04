@@ -31,6 +31,13 @@ export interface PullRequestInfo {
   pull_number?: number
   sha?: string
 }
+export interface PullRequestInfoFull {
+  owner: string
+  repo: string
+  ref: string
+  pull_number: number
+  sha: string
+}
 
 export interface File {
   filename: string
@@ -42,4 +49,21 @@ export interface GitFile {
   repo?: string
   filename: string
   sha: string
+}
+
+export interface CheckrunInfo {
+  owner: string
+  repo: string
+  head_sha: string
+  name: string
+}
+
+export interface Checkrun {
+  error: (error: string) => Promise<void>
+  queued: () => Promise<void>
+  progress: (time: Date) => Promise<void>
+  failure: (annotations: Annotation[], lines: number, skipped: string[])
+    => Promise<void>
+  warningSkipped: (skipped: string[]) => Promise<void>
+  success: () => Promise<void>
 }

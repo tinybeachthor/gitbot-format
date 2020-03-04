@@ -1,3 +1,5 @@
+import { Checkrun, CheckrunInfo, Annotation } from './types.d'
+
 const successGifs = [
   'https://imgur.com/xS6ZYWn.gif',
   'https://imgur.com/xAIRmOG.gif',
@@ -47,7 +49,7 @@ function getForSha(collection: any[], hash: string) {
   return collection[hash2number(hash) % collection.length]
 }
 
-export default (checks, statusInfo) => {
+export default (checks: any, statusInfo: CheckrunInfo): Checkrun => {
 
   const sha = statusInfo.head_sha
   let started_at = new Date()
@@ -91,7 +93,7 @@ export default (checks, statusInfo) => {
     })
   }
 
-  function failure (annotations: string[], lines: number, skipped: string[]) {
+  function failure (annotations: Annotation[], lines: number, skipped: string[]) {
     const skipped_filenames = skipped.reduce((acc, filename) => `${acc}${filename};`, '')
     const skipped_report = skipped_filenames !== '' ? `\n\nFailed to get or process following files:\n${skipped_filenames}` : ''
     return checks.create({
