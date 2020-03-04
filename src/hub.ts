@@ -1,7 +1,13 @@
 import yaml from 'js-yaml'
 import gitmodulesParser from './gitmodulesParser'
 
-export async function getGitmodules({owner, repo, ref}, repos, info) {
+import { PullRequestInfo, GitFile } from './types.d'
+
+export async function getGitmodules(
+  {owner, repo, ref}: PullRequestInfo,
+  repos: any,
+  info: (message: string) => void
+) {
   const gitmodulesFilename = '.gitmodules'
 
   info(`Trying to get ${gitmodulesFilename} from current branch`)
@@ -26,7 +32,11 @@ export async function getGitmodules({owner, repo, ref}, repos, info) {
   }
 }
 
-export async function getStylefile({owner, repo, ref}, repos, info) {
+export async function getStylefile(
+  {owner, repo, ref}: PullRequestInfo,
+  repos: any,
+  info: (message: string) => void
+) {
   const stylefileName = '.clang-format'
 
   // try getting stylefile from default branch (master) first
@@ -40,7 +50,7 @@ export async function getStylefile({owner, repo, ref}, repos, info) {
     const text = buffer.toString('utf8')
 
     // flatten YAML docs into single and convert YAML to JSON
-    const json = JSON.stringify(yaml.safeLoadAll(text).reduce((acc, doc) => {
+    const json = JSON.stringify(yaml.safeLoadAll(text).reduce((acc: object, doc) => {
       Object.keys(doc).forEach((key) => acc[key] = doc[key])
       return acc
     }), {})
@@ -78,9 +88,12 @@ export async function getStylefile({owner, repo, ref}, repos, info) {
   }
 }
 
-export async function getPRFileList (pulls, {owner, repo, pull_number}) {
+export async function getPRFileList (
+  pulls: any,
+  {owner, repo, pull_number}: PullRequestInfo
+) {
   let page = 1
-  const files = []
+  const files: GitFile[] = []
 
   let gotFiles
   do {
@@ -91,7 +104,7 @@ export async function getPRFileList (pulls, {owner, repo, pull_number}) {
       page,
       per_page: 50,
     })
-    response.data.forEach(({filename, sha}) => {
+    response.data.forEach(({filename, sha}: GitFile) => {
       files.push({filename, sha})
     })
 
@@ -103,14 +116,16 @@ export async function getPRFileList (pulls, {owner, repo, pull_number}) {
   return files
 }
 
-export async function getFile (git, {owner, repo, filename, sha}) {
+export async function getFile (
+  git: any,
+  {owner, repo, filename, sha}: GitFile) {
   return git
     .getBlob({
       owner,
       repo,
       file_sha: sha,
     })
-    .then(({ data }) => {
+    .then(({ data }: any) => {
       const buffer = Buffer.from(data.content, 'base64')
       const text = buffer.toString('utf8')
       return {
@@ -118,7 +133,7 @@ export async function getFile (git, {owner, repo, filename, sha}) {
         content: text,
       }
     })
-    .catch(e => {
+    .catch((e: Error) => {
       return {
         filename,
         exception: e,

@@ -36,3 +36,10 @@ export interface File {
   filename: string
   content: string
 }
+
+export interface GitFile {
+  owner?: string
+  repo?: string
+  filename: string
+  sha: string
+}
