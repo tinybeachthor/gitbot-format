@@ -1,23 +1,27 @@
-const logger = require('./logger')
+import logger from './logger'
+import formatFile from './format'
+import { getGitmodules, getStylefile, getPRFileList, getFile } from './hub'
+import generateAnnotations from './diff'
 
-const formatFile = require('./format')
-const { getGitmodules, getStylefile, getPRFileList, getFile } = require('./hub')
-const { generateAnnotations } = require('./diff')
+import { PullRequestInfo, Annotation } from './types.d'
 
-async function asyncForEach (array, callback) {
+async function asyncForEach (
+  array: any[],
+  callback: (elem: any, index: number, array: any[]) => Promise<void>
+) {
   for (let index = 0; index < array.length; index++) {
     await callback(array[index], index, array);
   }
 }
 
 export async function format (
-  {owner, repo, pull_number, sha, ref},
-  {git, pulls, repos},
+  {owner, repo, pull_number, sha, ref}: PullRequestInfo,
+  {git, pulls, repos}: any,
   status
 ) {
-  const info = (message) =>
+  const info = (message: string) =>
     logger.info(`${owner}/${repo}/${ref}:${sha}: ${message}`)
-  const error = (message) =>
+  const error = (message: string) =>
     logger.error(`${owner}/${repo}/${ref}:${sha}: ${message}`)
 
   // In progress
@@ -31,13 +35,13 @@ export async function format (
   const gitmodules = await getGitmodules({owner, repo, ref}, repos, info)
 
   // Get PR file list
-  pr_filenames = await getPRFileList(pulls, {owner, repo, pull_number})
+  const pr_filenames = await getPRFileList(pulls, {owner, repo, pull_number})
   const filenames = pr_filenames.reduce((acc, {filename}) => `${acc}${filename};`, '')
   info(`Got PR's changed files : ${filenames}`)
 
   // Process files
-  let skipped_filenames = []
-  let pushed_blobs = []
+  let skipped_filenames: string[] = []
+  let pushed_blobs: any[] = []
   await asyncForEach(pr_filenames, async ({filename, sha}) => {
     info(`Processing ${filename}`)
 
@@ -92,7 +96,7 @@ export async function format (
   filenamesErrored.length && info(`Couldn't get PR files : ${filenamesErrored}`)
 
   // create tree
-  const tree = []
+  const tree: any[] = []
   pushed_blobs.forEach(({ sha, filename }) => {
     tree.push({
       mode: '100644', // blob (file)
@@ -120,7 +124,7 @@ export async function format (
   info('Created commit')
 
   // update branch reference
-  const referenceResponse = await git.updateRef({
+  await git.updateRef({
     owner,
     repo,
     ref: `heads/${ref}`,
@@ -140,13 +144,13 @@ export async function format (
 }
 
 export async function lint(
-  {owner, repo, pull_number, sha, ref},
-  {git, pulls, repos},
+  {owner, repo, pull_number, sha, ref}: PullRequestInfo,
+  {git, pulls, repos}: any,
   status
 ) {
-  const info = (message) =>
+  const info = (message: string) =>
     logger.info(`${owner}/${repo}/${ref}:${sha}: ${message}`)
-  const error = (message) =>
+  const error = (message: string) =>
     logger.error(`${owner}/${repo}/${ref}:${sha}: ${message}`)
 
   // In progress
@@ -160,14 +164,14 @@ export async function lint(
   const gitmodules = await getGitmodules({owner, repo, ref}, repos, info)
 
   // Get PR file list
-  pr_filenames = await getPRFileList(pulls, {owner, repo, pull_number})
+  const pr_filenames = await getPRFileList(pulls, {owner, repo, pull_number})
   const filenames = pr_filenames.reduce((acc, {filename}) => `${acc}${filename};`, '')
   info(`Got PR's changed files : ${filenames}`)
 
   // Process files
-  let skipped_filenames = []
+  let skipped_filenames: string[] = []
   let touched_lines = 0
-  let output_annotations = []
+  let output_annotations: Annotation[] = []
   await asyncForEach(pr_filenames, async ({filename, sha}) => {
     info(`Processing ${filename}`)
 
