@@ -27,9 +27,9 @@ export interface Annotations {
 export interface PullRequestInfo {
   owner: string
   repo: string
-  pull_number: number
-  sha: string
   ref: string
+  pull_number?: number
+  sha?: string
 }
 
 export interface File {

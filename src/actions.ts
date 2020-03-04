@@ -35,7 +35,7 @@ export async function format (
   const gitmodules = await getGitmodules({owner, repo, ref}, repos, info)
 
   // Get PR file list
-  const pr_filenames = await getPRFileList(pulls, {owner, repo, pull_number})
+  const pr_filenames = await getPRFileList(pulls, {owner, repo, ref, pull_number})
   const filenames = pr_filenames.reduce((acc, {filename}) => `${acc}${filename};`, '')
   info(`Got PR's changed files : ${filenames}`)
 
@@ -66,10 +66,10 @@ export async function format (
           content: transformed.content,
           encoding: "utf-8",
         })
-        .then(({data}) => {
+        .then(({data}: any) => {
           return { sha: data.sha, filename }
         })
-        .catch((err) => err)
+        .catch((err: Error) => err)
       if (blob instanceof Error) {
         error(`Error pushing blob for ${filename}`)
         skipped_filenames.push(filename)
@@ -164,7 +164,7 @@ export async function lint(
   const gitmodules = await getGitmodules({owner, repo, ref}, repos, info)
 
   // Get PR file list
-  const pr_filenames = await getPRFileList(pulls, {owner, repo, pull_number})
+  const pr_filenames = await getPRFileList(pulls, {owner, repo, ref, pull_number})
   const filenames = pr_filenames.reduce((acc, {filename}) => `${acc}${filename};`, '')
   info(`Got PR's changed files : ${filenames}`)
 
