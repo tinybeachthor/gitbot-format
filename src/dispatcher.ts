@@ -2,6 +2,8 @@ import logger from './logger'
 import Status from './status'
 import { format, lint } from './actions'
 
+import { PullRequestInfo } from './types.d'
+
 type Task = () => Promise<void>
 interface TaskQueue {
   place(task: Task): void
@@ -37,7 +39,7 @@ function makeQueue(): TaskQueue {
 
 const queue = makeQueue()
 
-function handle(action: string, pr_info, github: any, status) {
+function handle(action: string, pr_info: PullRequestInfo, github: any, status) {
   const {owner, repo, sha, ref} = pr_info
 
   const task = async () => {
@@ -64,7 +66,7 @@ function handle(action: string, pr_info, github: any, status) {
   queue.place(task)
 }
 
-async function enqueue(action: string, pr_info, github: any) {
+async function enqueue(action: string, pr_info: PullRequestInfo, github: any) {
   const {owner, repo, pull_number, sha, ref} = pr_info
 
   // PR status check
