@@ -1,12 +1,14 @@
-const path = require('path')
-const {spawnSync} = require('child_process')
-const tempWrite = require('temp-write')
-const fs = require('fs')
+import fs from 'fs'
+import path from 'path'
+import { spawnSync } from 'child_process'
+import tempWrite from 'temp-write'
+
+import { File } from './types.d'
 
 const extensions =
   ['.c', '.h', '.cpp', '.hpp', '.C', '.H', '.cc', '.hh', '.cxx', '.hxx']
 
-export default async ({filename, content}, style) => {
+export default async ({filename, content}: File, style: string) => {
   if (!extensions.includes(path.extname(filename))) {
     return {filename, content, touched: false}
   }
@@ -19,7 +21,7 @@ export default async ({filename, content}, style) => {
   }
 }
 
-async function clangFormat (filename, content, style) {
+async function clangFormat (filename: string, content: string, style: string) {
   const formattedStyle = Buffer.from(style ? style : 'Google')
   const options = [
     "-style="+formattedStyle.toString('utf8'),
@@ -44,7 +46,7 @@ async function clangFormat (filename, content, style) {
   return output
 }
 
-function spawnAndPipe (filePath, options) {
+function spawnAndPipe (filePath: string, options: string[]) {
   return new Promise((resolve, reject) => {
     const p = spawnSync('clang-format', [...options, filePath], {
       stdio: 'ignore',

@@ -31,3 +31,8 @@ export interface PullRequestInfo {
   sha: string
   ref: string
 }
+
+export interface File {
+  filename: string
+  content: string
+}
