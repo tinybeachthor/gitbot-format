@@ -75,7 +75,7 @@ async function generateDiff (edited, original) {
   }
 }
 
-async function generateAnnotations (edited, original): Promise<Annotations> {
+export default async function generateAnnotations (edited, original): Promise<Annotations> {
   const hunks = await generateDiff(edited, original)
 
   return hunks.reduce(({annotations, lines}: Annotations, {oldStart, oldLines}: PatchRange) => {
@@ -94,8 +94,4 @@ async function generateAnnotations (edited, original): Promise<Annotations> {
     annotations: [],
     lines: 0,
   })
-}
-
-export default {
-  generateAnnotations
 }

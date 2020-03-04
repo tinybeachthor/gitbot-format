@@ -6,7 +6,7 @@ const fs = require('fs')
 const extensions =
   ['.c', '.h', '.cpp', '.hpp', '.C', '.H', '.cc', '.hh', '.cxx', '.hxx']
 
-module.exports = async ({filename, content}, style) => {
+export default async ({filename, content}, style) => {
   if (!extensions.includes(path.extname(filename))) {
     return {filename, content, touched: false}
   }

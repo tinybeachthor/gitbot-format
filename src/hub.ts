@@ -1,7 +1,7 @@
 import yaml from 'js-yaml'
 import gitmodulesParser from './gitmodulesParser'
 
-async function getGitmodules({owner, repo, ref}, repos, info) {
+export async function getGitmodules({owner, repo, ref}, repos, info) {
   const gitmodulesFilename = '.gitmodules'
 
   info(`Trying to get ${gitmodulesFilename} from current branch`)
@@ -26,7 +26,7 @@ async function getGitmodules({owner, repo, ref}, repos, info) {
   }
 }
 
-async function getStylefile({owner, repo, ref}, repos, info) {
+export async function getStylefile({owner, repo, ref}, repos, info) {
   const stylefileName = '.clang-format'
 
   // try getting stylefile from default branch (master) first
@@ -78,7 +78,7 @@ async function getStylefile({owner, repo, ref}, repos, info) {
   }
 }
 
-async function getPRFileList (pulls, {owner, repo, pull_number}) {
+export async function getPRFileList (pulls, {owner, repo, pull_number}) {
   let page = 1
   const files = []
 
@@ -102,7 +102,8 @@ async function getPRFileList (pulls, {owner, repo, pull_number}) {
 
   return files
 }
-async function getFile (git, {owner, repo, filename, sha}) {
+
+export async function getFile (git, {owner, repo, filename, sha}) {
   return git
     .getBlob({
       owner,
@@ -123,11 +124,4 @@ async function getFile (git, {owner, repo, filename, sha}) {
         exception: e,
       }
     })
-}
-
-module.exports = {
-  getGitmodules,
-  getStylefile,
-  getPRFileList,
-  getFile,
 }
