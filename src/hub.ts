@@ -50,10 +50,9 @@ export async function getStylefile(
     const text = buffer.toString('utf8')
 
     // flatten YAML docs into single and convert YAML to JSON
-    const json = JSON.stringify(yaml.safeLoadAll(text).reduce((acc: object, doc) => {
-      Object.keys(doc).forEach((key) => acc[key] = doc[key])
-      return acc
-    }), {})
+    const json = JSON.stringify(yaml
+      .safeLoadAll(text)
+      .reduce((acc: object, doc: object) => { return {...acc, ...doc} }, {}))
 
     info(`Got stylefile from default branch : ${json}`)
     return json
@@ -72,10 +71,9 @@ export async function getStylefile(
       const text = buffer.toString('utf8')
 
       // flatten YAML docs into single and convert YAML to JSON
-      const json = JSON.stringify(yaml.safeLoadAll(text).reduce((acc, doc) => {
-        Object.keys(doc).forEach((key) => acc[key] = doc[key])
-        return acc
-      }), {})
+      const json = JSON.stringify(yaml
+        .safeLoadAll(text)
+        .reduce((acc: object, doc: object) => { return {...acc, ...doc} }, {}))
 
       info(`Got stylefile from PR branch : ${json}`)
       return json
