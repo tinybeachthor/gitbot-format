@@ -8,7 +8,8 @@
     "noImplicitAny": true,
     "esModuleInterop": true,
     "types": [
-      "node"
+      "node",
+      "jest"
     ]
   },
   "exclude": ["node_modules", "**/*.test.ts"]
