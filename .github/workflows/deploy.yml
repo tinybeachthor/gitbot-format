@@ -12,15 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - uses: borales/actions-yarn@v2.1.0
+    - uses: actions/setup-node@v1
       with:
-        cmd: install
-    - uses: borales/actions-yarn@v2.1.0
-      with:
-        cmd: build
-    - uses: borales/actions-yarn@v2.1.0
-      with:
-        cmd: test
+        node-version: '10.x'
+    - run: npm install
+    - run: npm build
+    - run: npm test
     - name: Publish to DockerHub
       uses: elgohr/Publish-Docker-Github-Action@2.13
       with:
