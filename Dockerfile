@@ -1,4 +1,4 @@
-FROM node:lts-buster
+FROM node:10-buster-slim
 
 # install dependencies
 RUN apt update -y && apt install -y \
