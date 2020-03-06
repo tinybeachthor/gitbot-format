@@ -1,10 +1,8 @@
 import yaml from 'js-yaml'
 import gitmodulesParser from './gitmodulesParser'
 
-import { PullRequestInfo, GitFile } from './types.d'
-
 export async function getGitmodules(
-  {owner, repo, ref}: PullRequestInfo,
+  {owner, repo, ref}: types.PullRequestInfo,
   repos: any,
   info: (message: string) => void
 ) {
@@ -33,7 +31,7 @@ export async function getGitmodules(
 }
 
 export async function getStylefile(
-  {owner, repo, ref}: PullRequestInfo,
+  {owner, repo, ref}: types.PullRequestInfo,
   repos: any,
   info: (message: string) => void
 ) {
@@ -88,10 +86,10 @@ export async function getStylefile(
 
 export async function getPRFileList (
   pulls: any,
-  {owner, repo, pull_number}: PullRequestInfo
+  {owner, repo, pull_number}: types.PullRequestInfo
 ) {
   let page = 1
-  const files: GitFile[] = []
+  const files: types.GitFile[] = []
 
   let gotFiles
   do {
@@ -102,7 +100,7 @@ export async function getPRFileList (
       page,
       per_page: 50,
     })
-    response.data.forEach(({filename, sha}: GitFile) => {
+    response.data.forEach(({filename, sha}: types.GitFile) => {
       files.push({filename, sha})
     })
 
@@ -116,7 +114,7 @@ export async function getPRFileList (
 
 export async function getFile (
   git: any,
-  {owner, repo, filename, sha}: GitFile) {
+  {owner, repo, filename, sha}: types.GitFile) {
   return git
     .getBlob({
       owner,
