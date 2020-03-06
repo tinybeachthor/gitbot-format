@@ -1,0 +1,28 @@
+name: "build-package-push"
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+
+jobs:
+
+  build-package-push:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: borales/actions-yarn@v2.1.0
+      with:
+        cmd: install
+    - uses: borales/actions-yarn@v2.1.0
+      with:
+        cmd: build
+    - name: Publish to DockerHub
+      uses: elgohr/Publish-Docker-Github-Action@2.13
+      with:
+        name: whomenope/gitbot-format
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        dockerfile: Dockerfile
+        tag_semver: true
