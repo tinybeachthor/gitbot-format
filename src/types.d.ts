@@ -7,17 +7,11 @@ declare module types {
     newLines: number
   }
 
-  enum AnnotationLevel {
-    Failure = 'failure',
-    Warning = 'warning',
-    Infor = 'info',
-  }
-
   interface Annotation {
     path: string
     start_line: number
     end_line: number
-    annotation_level: AnnotationLevel
+    annotation_level: string
     message: string
   }
 

@@ -82,7 +82,7 @@ export default async function generateAnnotations (edited: types.File, original:
       path: original.filename,
       start_line: oldStart,
       end_line: oldStart + oldLines,
-      annotation_level: types.AnnotationLevel.Failure,
+      annotation_level: 'failure',
       message: `Lines ${oldStart}-${oldStart+oldLines} need formatting.`,
     })
     return {
