@@ -26,7 +26,7 @@ Making it easy to restart/upgrade/migrate/manage the deployment.
 ## Changelog
 |version|changes|
 |---|---|
-|0.7.1|Convert over to TypeScript, bug fixes|
+|0.7.1|Convert over to TypeScript, bug fixes, use alpine base image|
 |0.7.0|Don't warn about skipped submodules dirs, remove faulty gifs|
 |---|---|
 |0.6.3|Add gifs for failure + more success gifs|
