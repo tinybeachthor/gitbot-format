@@ -1,8 +1,8 @@
-FROM node:10-buster-slim
+FROM node:10-alpine
 
 # install dependencies
-RUN apt update -y && apt install -y \
-  clang-format \
+RUN apk update && apk add \
+  clang \
   git
 
 # install app
