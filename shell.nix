@@ -18,5 +18,7 @@ mkShell {
   buildInputs = [
     nodejs
     yarn
+
+    clang
   ];
 }
