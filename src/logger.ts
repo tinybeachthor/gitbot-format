@@ -1,34 +1,32 @@
-import { createLogger, format, transports } from 'winston'
+import winston from 'winston'
 
-const { combine, timestamp, printf } = format
+const { combine, timestamp, printf } = winston.format
 
-const logFormat = printf(info => {
-  const name = process.env.PROGRAM_ALIAS ? process.env.PROGRAM_ALIAS + ':' : ''
-  return `${name}${info.timestamp}:${info.level}: ${info.message}`
-})
-
-const logger = createLogger({
+winston.configure({
   level: process.env.LOG_LEVEL === 'debug' ? 'debug' : 'info',
   format: combine(
     timestamp(),
-    logFormat
+    printf(info => {
+      const name = process.env.PROGRAM_ALIAS ? process.env.PROGRAM_ALIAS + ':' : ''
+      return `${name}${info.timestamp}:${info.level}: ${info.message}`
+    })
   ),
   transports: [
-    new transports.Console(),
+    new winston.transports.Console(),
   ],
 })
 
 if (process.env.LOG_FILE === 'true') {
-  logger.add(
+  winston.add(
     // - Write all logs error (and below) to `error.log`.
-    new transports.File({ filename: 'error.log', level: 'error' })
+    new winston.transports.File({ filename: 'error.log', level: 'error' })
   )
-  logger.add(
+  winston.add(
     // - Write to all logs with level `info` and below to `combined.log`
-    new transports.File({ filename: 'combined.log' })
+    new winston.transports.File({ filename: 'combined.log' })
   )
 }
 
-logger.info('logger started up')
+winston.info('logger started up')
 
-export default logger
+export default winston
