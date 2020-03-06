@@ -3,8 +3,6 @@ import formatFile from './format'
 import { getGitmodules, getStylefile, getPRFileList, getFile } from './hub'
 import generateAnnotations from './diff'
 
-import { PullRequestInfo, Annotation, Checkrun } from './types.d'
-
 async function asyncForEach (
   array: any[],
   callback: (elem: any, index: number, array: any[]) => Promise<void>
@@ -15,9 +13,9 @@ async function asyncForEach (
 }
 
 export async function format (
-  {owner, repo, pull_number, sha, ref}: PullRequestInfo,
+  {owner, repo, pull_number, sha, ref}: types.PullRequestInfo,
   {git, pulls, repos}: any,
-  status: Checkrun
+  status: types.Checkrun
 ) {
   const info = (message: string) =>
     logger.info(`${owner}/${repo}/${ref}:${sha}: ${message}`)
@@ -144,9 +142,9 @@ export async function format (
 }
 
 export async function lint(
-  {owner, repo, pull_number, sha, ref}: PullRequestInfo,
+  {owner, repo, pull_number, sha, ref}: types.PullRequestInfo,
   {git, pulls, repos}: any,
-  status: Checkrun
+  status: types.Checkrun
 ) {
   const info = (message: string) =>
     logger.info(`${owner}/${repo}/${ref}:${sha}: ${message}`)
@@ -171,7 +169,7 @@ export async function lint(
   // Process files
   let skipped_filenames: string[] = []
   let touched_lines = 0
-  let output_annotations: Annotation[] = []
+  let output_annotations: types.Annotation[] = []
   await asyncForEach(pr_filenames, async ({filename, sha}) => {
     info(`Processing ${filename}`)
 

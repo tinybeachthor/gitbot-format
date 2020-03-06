@@ -3,13 +3,11 @@ import path from 'path'
 import { spawnSync } from 'child_process'
 import tempWrite from 'temp-write'
 
-import { File } from './types.d'
-
 const extensions =
   ['.c', '.h', '.cpp', '.hpp', '.C', '.H', '.cc', '.hh', '.cxx', '.hxx']
 
 export default async function formatFile (
-  {filename, content}: File,
+  {filename, content}: types.File,
   style: string | null
 ) {
   if (!extensions.includes(path.extname(filename))) {

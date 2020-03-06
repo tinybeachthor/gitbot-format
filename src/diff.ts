@@ -4,10 +4,9 @@ import { spawn } from 'child_process'
 import tempWrite from 'temp-write'
 
 import { SpawnOptions } from 'child_process'
-import { PatchRange, Annotations, AnnotationLevel, File } from './types.d'
 
 // '@@ -6,10 +6,9 @@ int checkEvenOrOdd() {' => {6, 10, 6, 9}
-function parsePatchHeader (header: string): PatchRange {
+function parsePatchHeader (header: string): types.PatchRange {
   const lineStats = (header.split('@@')[1]).split(' ')
   const originalStats = lineStats[1].substr(1).split(',')
   const editedStats = lineStats[2].substr(1).split(',')
@@ -51,7 +50,7 @@ async function spawnAndGet (
   })
 }
 
-async function generateDiff (edited: File, original: File) {
+async function generateDiff (edited: types.File, original: types.File) {
   const editedFile = tempWrite.sync(edited.content, path.basename(edited.filename))
   const originalFile = tempWrite.sync(original.content, path.basename(original.filename))
 
@@ -75,15 +74,15 @@ async function generateDiff (edited: File, original: File) {
   }
 }
 
-export default async function generateAnnotations (edited: File, original: File): Promise<Annotations> {
+export default async function generateAnnotations (edited: types.File, original: types.File): Promise<types.Annotations> {
   const hunks = await generateDiff(edited, original)
 
-  return hunks.reduce(({annotations, lines}: Annotations, {oldStart, oldLines}: PatchRange) => {
+  return hunks.reduce(({annotations, lines}: types.Annotations, {oldStart, oldLines}: types.PatchRange) => {
     annotations.push({
       path: original.filename,
       start_line: oldStart,
       end_line: oldStart + oldLines,
-      annotation_level: AnnotationLevel.Failure,
+      annotation_level: types.AnnotationLevel.Failure,
       message: `Lines ${oldStart}-${oldStart+oldLines} need formatting.`,
     })
     return {
