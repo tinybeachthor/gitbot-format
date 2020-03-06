@@ -7,8 +7,8 @@ RUN apt update -y && apt install -y \
 
 # install app
 WORKDIR /gitbot-format
-ADD package.json yarn.lock ./
-RUN yarn install --production --frozen-lockfile
+ADD package.json package-lock.json ./
+RUN npm install --production --frozen-lockfile
 
 # add app files
 COPY . .
@@ -16,4 +16,4 @@ COPY . .
 # start
 EXPOSE 3000
 USER node
-CMD ["yarn", "start"]
+CMD ["npm", "run", "start"]
