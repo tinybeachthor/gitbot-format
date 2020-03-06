@@ -12,4 +12,3 @@ shell.nix
 app.yml
 tsconfig.json
 jest.config.js
-yarn-error.log
