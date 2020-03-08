@@ -1,17 +1,12 @@
 {
   "name": "gitbot-format",
-  "version": "1.0.0",
+  "version": "0.8.0",
   "description": "Github PR formatting app",
   "author": "Martin Toman <whomenope@outlook.com>",
   "license": "ISC",
   "repository": "https://github.com/WhoMeNope/gitbot-format",
   "homepage": "https://github.com/WhoMeNope/gitbot-format",
   "bugs": "https://github.com/WhoMeNope/gitbot-format/issues",
-  "keywords": [
-    "probot",
-    "github",
-    "probot-app"
-  ],
   "scripts": {
     "build": "tsc",
     "dev": "nodemon",
