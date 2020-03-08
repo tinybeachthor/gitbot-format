@@ -24,7 +24,9 @@ Making it easy to restart/upgrade/migrate/manage the deployment.
 > (no need to rebase every feature branch)
 
 ## Changelog
-|version|changes|
+|Version|Changes|
+|---|:---|
+|0.8.0|Skip 'in_progress' status, Show bot version in checkrun|
 |---|---|
 |0.7.1|Convert over to TypeScript, bug fixes, use alpine base image|
 |0.7.0|Don't warn about skipped submodules dirs, remove faulty gifs|
