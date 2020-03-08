@@ -1,4 +1,4 @@
-import { name, version, bugs } from '../package.json'
+const { name, version, bugs } = require('../package.json')
 import { successGifs, failureGifs } from './gifs'
 
 const versionString = `
