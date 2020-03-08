@@ -19,7 +19,7 @@ export async function getGitmodules(
     const buffer = Buffer.from(response.data.content, 'base64')
     const text = buffer.toString('utf8')
 
-    info(`Got ${gitmodulesFilename} from ${ref} branch : ${text}`)
+    info(`Got ${gitmodulesFilename} from ${ref} branch`)
 
     return gitmodulesParser.parsePaths(text)
   }
