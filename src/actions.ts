@@ -22,9 +22,7 @@ export async function format (
   const error = (message: string) =>
     logger.error(`${owner}/${repo}/${ref}:${sha}: ${message}`)
 
-  // In progress
-  await status.progress(new Date())
-  info('In Progress')
+  info('Running')
 
   // Check if exists and get /.clang-format
   const style = await getStylefile({owner, repo, ref}, repos, info)
@@ -151,9 +149,7 @@ export async function lint(
   const error = (message: string) =>
     logger.error(`${owner}/${repo}/${ref}:${sha}: ${message}`)
 
-  // In progress
-  await status.progress(new Date())
-  info('In Progress')
+  info('Running')
 
   // Check if exists and get /.clang-format
   const style = await getStylefile({owner, repo, ref}, repos, info)
