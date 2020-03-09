@@ -1,7 +1,7 @@
 const logger = require('./lib/logger').default
 const { enqueue, actions } = require('./lib/dispatcher')
 
-const Octokit = require("@octokit/rest")
+const { Octokit } = require("@octokit/rest")
 
 /**
  * This is the main entrypoint to your Probot app
