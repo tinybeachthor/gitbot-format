@@ -12,8 +12,8 @@ module.exports = async bot => {
 
   // PR open/updated
   const enqueuePR = async (context) => {
-    const {owner, repo, number} = context.issue()
-    const {sha, ref} = context.payload.pull_request.head
+    const {owner, repo, number} = context.issue
+    const {sha, ref} = context
 
     await enqueue(actions.LINT, {
       owner,
@@ -28,14 +28,13 @@ module.exports = async bot => {
 
   // Check run requested action
   const requestedFormat = async (context) => {
-    const {owner, repo} = context.issue()
+    const {owner, repo, number} = context.issue
     const {head_branch, head_sha} = context.payload.check_run.check_suite
-    const pull_number = context.payload.check_run.check_suite.pull_requests[0].number
 
     await enqueue(actions.FORMAT, {
       owner,
       repo,
-      pull_number,
+      pull_number: number,
       sha: head_sha,
       ref: head_branch,
     }, context.github)
@@ -44,14 +43,13 @@ module.exports = async bot => {
 
   // Check rerun
   const rerunCheck = async (context) => {
-    const {owner, repo} = context.issue()
+    const {owner, repo, number} = context.issue
     const {head_branch, head_sha} = context.payload.check_run.check_suite
-    const pull_number = context.payload.check_run.check_suite.pull_requests[0].number
 
     await enqueue(actions.LINT, {
       owner,
       repo,
-      pull_number,
+      pull_number: number,
       sha: head_sha,
       ref: head_branch,
     }, context.github)

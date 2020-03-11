@@ -1,6 +1,6 @@
 {
   "name": "gitbot-format",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Github PR formatting app",
   "author": "Martin Toman <whomenope@outlook.com>",
   "license": "ISC",
