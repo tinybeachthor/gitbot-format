@@ -1,0 +1,18 @@
+name: 'gitbot-format'
+description: "Keeps your PR's tidy using clang-format."
+branding:
+  color: 'blue'
+  icon: 'check'
+
+inputs:
+  repo-token:
+    description: 'GITHUB_TOKEN used for interacting with the repo.'
+    required: true
+  config-path:
+    description: 'Path to `.clang-format` style configuration file'
+    required: false
+    default: '.clang-format'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
