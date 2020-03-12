@@ -10,7 +10,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon",
-    "start": "probot run ./index.js",
+    "start": "node index.js",
     "test": "jest",
     "test:watch": "jest --watch --notify --notifyMode=change --coverage"
   },

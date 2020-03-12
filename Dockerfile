@@ -14,6 +14,5 @@ RUN npm install --production --frozen-lockfile
 COPY . .
 
 # start
-EXPOSE 3000
 USER node
 CMD ["npm", "run", "start"]
