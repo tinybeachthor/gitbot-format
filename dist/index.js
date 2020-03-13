@@ -997,13 +997,7 @@ exports.default = (checks, statusInfo) => {
                     },
                 ],
                 annotations: annotations.slice(0, 50),
-            }, actions: [
-                {
-                    label: 'Format!',
-                    description: 'Format files in this PR.',
-                    identifier: 'gitbot-format_format',
-                },
-            ] }));
+            } }));
     }
     function warningSkipped(skipped) {
         const options = Object.assign(Object.assign({}, statusInfo), { status: "completed", started_at, completed_at: new Date(), conclusion: "neutral" });
