@@ -1,14 +1,7 @@
 .env
 
 .git/
+shell.nix
 
 node_modules/
-__tests__/
 coverage/
-
-src/
-
-shell.nix
-app.yml
-tsconfig.json
-jest.config.js
