@@ -952,16 +952,7 @@ module.exports = new Type('tag:yaml.org,2002:timestamp', {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const { name, version, bugs } = __webpack_require__(731);
 const gifs_1 = __webpack_require__(103);
-const versionString = `
-
-Formatted with :heart: by ${name}@${version}
-`;
-const bugsString = `
-
-Please report this issue at: ${bugs}
-`;
 function getForSha(collection, hash) {
     function hash2number(hash) {
         return hash
@@ -977,20 +968,20 @@ exports.default = (checks, statusInfo) => {
     function error(error) {
         return checks.create(Object.assign(Object.assign({}, statusInfo), { status: "completed", started_at, completed_at: new Date(), conclusion: "failure", output: {
                 title: 'Error',
-                summary: `Error occurred : ${error}` + versionString + bugsString,
+                summary: `Error occurred : ${error}`,
             } }));
     }
     function queued() {
         return checks.create(Object.assign(Object.assign({}, statusInfo), { status: "queued", output: {
                 title: 'Queued...',
-                summary: 'Waiting to run' + versionString,
+                summary: 'Waiting to run',
             } }));
     }
     function progress(time) {
         started_at = time;
         return checks.create(Object.assign(Object.assign({}, statusInfo), { status: "in_progress", started_at, output: {
                 title: 'Formatting...',
-                summary: 'Running the job' + versionString,
+                summary: 'Running the job',
             } }));
     }
     function failure(annotations, lines, skipped) {
@@ -998,7 +989,7 @@ exports.default = (checks, statusInfo) => {
         const skipped_report = skipped_filenames !== '' ? `\n\nFailed to get or process following files:\n${skipped_filenames}` : '';
         return checks.create(Object.assign(Object.assign({}, statusInfo), { status: "completed", started_at, completed_at: new Date(), conclusion: "action_required", output: {
                 title: `${lines} lines need formatting`,
-                summary: `Showing first 50 formatting issues.` + skipped_report + versionString,
+                summary: `Showing first 50 formatting issues.` + skipped_report,
                 images: [
                     {
                         alt: 'sad',
@@ -1020,21 +1011,21 @@ exports.default = (checks, statusInfo) => {
             const filename = skipped[0];
             return checks.create(Object.assign(Object.assign({}, options), { output: {
                     title: `Skipped ${filename}`,
-                    summary: `Failed to get or process following file:\n${filename}` + versionString + bugsString,
+                    summary: `Failed to get or process following file:\n${filename}`,
                 } }));
         }
         else {
             const filenames = skipped.reduce((acc, filename) => `${acc}${filename};`, '');
             return checks.create(Object.assign(Object.assign({}, options), { output: {
                     title: `Skipped ${skipped.length} files`,
-                    summary: `Failed to get or process following files:\n${filenames}` + versionString + bugsString,
+                    summary: `Failed to get or process following files:\n${filenames}`,
                 } }));
         }
     }
     function success() {
         return checks.create(Object.assign(Object.assign({}, statusInfo), { status: "completed", started_at, completed_at: new Date(), conclusion: "success", output: {
                 title: 'Format all right!',
-                summary: 'Beautiful code right there!' + versionString,
+                summary: 'Beautiful code right there!',
                 images: [
                     {
                         alt: 'happy',
@@ -15644,13 +15635,6 @@ module.exports = function nodeRNG() {
   return crypto.randomBytes(16);
 };
 
-
-/***/ }),
-
-/***/ 731:
-/***/ (function(module) {
-
-module.exports = {"name":"gitbot-format","version":"0.8.1","description":"Github PR formatting app","private":true,"author":"Martin Toman <whomenope@outlook.com>","license":"ISC","repository":"https://github.com/WhoMeNope/gitbot-format","homepage":"https://github.com/WhoMeNope/gitbot-format","bugs":"https://github.com/WhoMeNope/gitbot-format/issues","scripts":{"build":"tsc","start":"node out/index.js","pack":"ncc build","test":"jest","test:watch":"jest --watch --notify --notifyMode=change --coverage"},"main":"out/index.js","dependencies":{"@actions/core":"^1.2.3","@actions/github":"^2.1.1","js-yaml":"^3.13.1","temp-write":"^4.0.0"},"devDependencies":{"@types/jest":"^25.1.3","@types/js-yaml":"^3.12.2","@types/node":"^13.7.7","@typescript-eslint/parser":"^2.21.0","@zeit/ncc":"^0.20.5","eslint":"^6.8.0","eslint-plugin-github":"^3.4.1","eslint-plugin-jest":"^23.8.1","jest":"^25.1.0","jest-circus":"^25.1.0","prettier":"^1.19.1","ts-jest":"^25.2.1","typescript":"^3.8.3"}};
 
 /***/ }),
 
