@@ -65,7 +65,11 @@ export default (checks: any, statusInfo: types.CheckrunInfo): types.Checkrun => 
       conclusion: "action_required",
       output: {
         title: `${lines} lines need formatting`,
-        summary: `Showing first 50 formatting issues.` + skipped_report,
+        summary: `
+          **PROTIP: Include \`/format\` in PR's message or comment to trigger automated formatting.** ;)
+
+          Showing first 50 formatting issues.
+        ` + skipped_report,
         images: [
           {
             alt: 'sad',
