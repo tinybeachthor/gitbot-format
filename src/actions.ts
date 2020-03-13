@@ -14,8 +14,7 @@ async function asyncForEach (
 
 export async function format (
   {owner, repo, pull_number, sha, ref}: types.PullRequestInfo,
-  {git, pulls, repos}: any,
-  status: types.Checkrun
+  {git, pulls, repos, checks}: any
 ) {
   console.info('Running')
 
@@ -125,12 +124,12 @@ export async function format (
   console.info('Updated ref')
 
   // Setup PR status check for new commit
-  await Status(status.getAPI(), {
+  const status = Status(checks, {
     owner,
     repo,
     name: 'clang-format',
     head_sha: commitResponse.data.sha,
-  }).success()
+  })
 
   // Completed
   if (skipped_filenames.length > 0) {

@@ -28,28 +28,23 @@ async function run () {
   })
   const {sha, ref} = pr.data.head
 
-  // Setup PR status check
-  const status = Status(octokit.checks, {
-    owner,
-    repo,
-    name: 'clang-format',
-    head_sha: sha,
-  })
-  await status.queued()
-
   // Run
-  try {
-    const details = { owner, repo, pull_number, sha, ref }
+  const details = { owner, repo, pull_number, sha, ref }
 
-    if (!proactive) {
-      await lint(details, octokit, status)
-    }
-    else {
-      await format(details, octokit, status)
-    }
+  if (!proactive) {
+    // Setup PR status check
+    const status = Status(octokit.checks, {
+      owner,
+      repo,
+      name: 'clang-format',
+      head_sha: sha,
+    })
+    await status.queued()
+
+    await lint(details, octokit, status)
   }
-  catch (error) {
-    status.error(error)
+  else {
+    await format(details, octokit)
   }
 }
 
