@@ -11,8 +11,8 @@ ADD package.json package-lock.json ./
 RUN npm install --production --frozen-lockfile
 
 # add app files
-COPY ./dist/ ./out/
+COPY ./dist/ ./
 
 # start
 USER node
-CMD ["npm", "run", "start"]
+CMD ["node", "/gitbot-format/index.js"]
