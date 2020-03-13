@@ -74,13 +74,6 @@ export default (checks: any, statusInfo: types.CheckrunInfo): types.Checkrun => 
         ],
         annotations: annotations.slice(0, 50), // Limited to 50 at a time
       },
-      actions: [
-        {
-          label: 'Format!',
-          description: 'Format files in this PR.',
-          identifier: 'gitbot-format_format',
-        },
-      ],
     })
   }
 
