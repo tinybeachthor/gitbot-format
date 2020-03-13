@@ -1041,6 +1041,7 @@ exports.default = (checks, statusInfo) => {
         failure,
         warningSkipped,
         success,
+        getAPI: () => checks,
     };
 };
 
@@ -6640,6 +6641,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const format_1 = __importDefault(__webpack_require__(447));
 const hub_1 = __webpack_require__(422);
 const diff_1 = __importDefault(__webpack_require__(124));
+const status_1 = __importDefault(__webpack_require__(86));
 function asyncForEach(array, callback) {
     return __awaiter(this, void 0, void 0, function* () {
         for (let index = 0; index < array.length; index++) {
@@ -6742,6 +6744,13 @@ function format({ owner, repo, pull_number, sha, ref }, { git, pulls, repos }, s
             force: false,
         });
         console.info('Updated ref');
+        // Setup PR status check for new commit
+        yield status_1.default(status.getAPI(), {
+            owner,
+            repo,
+            name: 'clang-format',
+            head_sha: commitResponse.data.sha,
+        }).success();
         // Completed
         if (skipped_filenames.length > 0) {
             yield status.warningSkipped(skipped_filenames);
