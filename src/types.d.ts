@@ -64,7 +64,5 @@ declare module types {
       => Promise<void>
     warningSkipped: (skipped: string[]) => Promise<void>
     success: () => Promise<void>
-
-    getAPI: () => any
   }
 }
