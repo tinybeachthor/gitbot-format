@@ -1,4 +1,3 @@
-import logger from './logger'
 import formatFile from './format'
 import { getGitmodules, getStylefile, getPRFileList, getFile } from './hub'
 import generateAnnotations from './diff'
@@ -17,29 +16,24 @@ export async function format (
   {git, pulls, repos}: any,
   status: types.Checkrun
 ) {
-  const info = (message: string) =>
-    logger.info(`${owner}/${repo}/${ref}:${sha}: ${message}`)
-  const error = (message: string) =>
-    logger.error(`${owner}/${repo}/${ref}:${sha}: ${message}`)
-
-  info('Running')
+  console.info('Running')
 
   // Check if exists and get /.clang-format
-  const style = await getStylefile({owner, repo, ref}, repos, info)
+  const style = await getStylefile({owner, repo, ref}, repos, console.info)
 
   // Check if exists and get /.gitmodules paths
-  const gitmodules = await getGitmodules({owner, repo, ref}, repos, info)
+  const gitmodules = await getGitmodules({owner, repo, ref}, repos, console.info)
 
   // Get PR file list
   const pr_filenames = await getPRFileList(pulls, {owner, repo, ref, pull_number})
   const filenames = pr_filenames.reduce((acc, {filename}) => `${acc}${filename};`, '')
-  info(`Got PR's changed files : ${filenames}`)
+  console.info(`Got PR's changed files : ${filenames}`)
 
   // Process files
   let skipped_filenames: string[] = []
   let pushed_blobs: any[] = []
   await asyncForEach(pr_filenames, async ({filename, sha}) => {
-    info(`Processing ${filename}`)
+    console.info(`Processing ${filename}`)
 
     try {
       // Get file
@@ -67,18 +61,18 @@ export async function format (
         })
         .catch((err: Error) => err)
       if (blob instanceof Error) {
-        error(`Error pushing blob for ${filename}`)
+        console.error(`Error pushing blob for ${filename}`)
         skipped_filenames.push(filename)
         return
       }
-      info(`Created blob for: ${filename}`)
+      console.info(`Created blob for: ${filename}`)
       pushed_blobs.push(blob)
     }
     catch (err) {
       if (err)
-        error(`Error transforming ${filename} : ${err}`)
+        console.error(`Error transforming ${filename} : ${err}`)
       else
-        error(`Error transforming ${filename}`)
+        console.error(`Error transforming ${filename}`)
       skipped_filenames.push(filename)
     }
   })
@@ -89,7 +83,7 @@ export async function format (
   // serialize skipped_filenames for printing
   const filenamesErrored =
     skipped_filenames.reduce((acc, filename) => `${acc}${filename};`, '')
-  filenamesErrored.length && info(`Couldn't get PR files : ${filenamesErrored}`)
+  filenamesErrored.length && console.info(`Couldn't get PR files : ${filenamesErrored}`)
 
   // create tree
   const tree: any[] = []
@@ -107,7 +101,7 @@ export async function format (
     tree,
     base_tree: sha,
   })
-  info('Created tree')
+  console.info('Created tree')
 
   // create commit
   const commitResponse = await git.createCommit({
@@ -117,7 +111,7 @@ export async function format (
     tree: treeResponse.data.sha,
     parents: [sha],
   })
-  info('Created commit')
+  console.info('Created commit')
 
   // update branch reference
   await git.updateRef({
@@ -127,7 +121,7 @@ export async function format (
     sha: commitResponse.data.sha,
     force: false,
   })
-  info('Updated ref')
+  console.info('Updated ref')
 
   // Completed
   if (skipped_filenames.length > 0) {
@@ -136,7 +130,7 @@ export async function format (
   else {
     await status.success()
   }
-  info('Completed')
+  console.info('Completed')
 }
 
 export async function lint(
@@ -144,35 +138,30 @@ export async function lint(
   {git, pulls, repos}: any,
   status: types.Checkrun
 ) {
-  const info = (message: string) =>
-    logger.info(`${owner}/${repo}/${ref}:${sha}: ${message}`)
-  const error = (message: string) =>
-    logger.error(`${owner}/${repo}/${ref}:${sha}: ${message}`)
-
-  info('Running')
+  console.info('Running')
 
   // Check if exists and get /.clang-format
-  const style = await getStylefile({owner, repo, ref}, repos, info)
+  const style = await getStylefile({owner, repo, ref}, repos, console.info)
 
   // Check if exists and get /.gitmodules paths
-  const gitmodules = await getGitmodules({owner, repo, ref}, repos, info)
+  const gitmodules = await getGitmodules({owner, repo, ref}, repos, console.info)
 
   // Get PR file list
   const pr_filenames = await getPRFileList(pulls, {owner, repo, ref, pull_number})
   const filenames = pr_filenames.reduce((acc, {filename}) => `${acc}${filename};`, '')
-  info(`Got PR's changed files : ${filenames}`)
+  console.info(`Got PR's changed files : ${filenames}`)
 
   // Process files
   let skipped_filenames: string[] = []
   let touched_lines = 0
   let output_annotations: types.Annotation[] = []
   await asyncForEach(pr_filenames, async ({filename, sha}) => {
-    info(`Processing ${filename}`)
+    console.info(`Processing ${filename}`)
 
     // Get file
     const file = await getFile(git, {owner, repo, filename, sha})
     if (file.exception || !file.content) {
-      error(`Error getting ${filename}`)
+      console.error(`Error getting ${filename}`)
       skipped_filenames.push(filename)
       return
     }
@@ -193,9 +182,9 @@ export async function lint(
     }
     catch (err) {
       if (err)
-        error(`Error transforming ${filename} : ${err}`)
+        console.error(`Error transforming ${filename} : ${err}`)
       else
-        error(`Error transforming ${filename}`)
+        console.error(`Error transforming ${filename}`)
       skipped_filenames.push(filename)
     }
   })
@@ -206,20 +195,20 @@ export async function lint(
   // serialize skipped_filenames for printing
   const filenamesErrored =
     skipped_filenames.reduce((acc, filename) => `${acc}${filename};`, '')
-  filenamesErrored.length && info(`Couldn't get PR files : ${filenamesErrored}`)
+  filenamesErrored.length && console.info(`Couldn't get PR files : ${filenamesErrored}`)
 
   // If files touched -> check status annotations
   if (touched_lines > 0 || output_annotations.length > 0) {
-    info(`Touched ${touched_lines} lines`)
+    console.info(`Touched ${touched_lines} lines`)
     await status.failure(output_annotations, touched_lines, skipped_filenames)
   }
   else if (skipped_filenames.length > 0) {
-    info (`Skipped ${skipped_filenames.length} files`)
+    console.info (`Skipped ${skipped_filenames.length} files`)
     await status.warningSkipped(skipped_filenames)
   }
   else {
-    info('No files touched')
+    console.info('No files touched')
     await status.success()
   }
-  info('Completed')
+  console.info('Completed')
 }
