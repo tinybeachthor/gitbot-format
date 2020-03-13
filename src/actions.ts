@@ -1,6 +1,7 @@
 import formatFile from './format'
 import { getGitmodules, getStylefile, getPRFileList, getFile } from './hub'
 import generateAnnotations from './diff'
+import Status from './status'
 
 async function asyncForEach (
   array: any[],
@@ -122,6 +123,14 @@ export async function format (
     force: false,
   })
   console.info('Updated ref')
+
+  // Setup PR status check for new commit
+  await Status(status.getAPI(), {
+    owner,
+    repo,
+    name: 'clang-format',
+    head_sha: commitResponse.data.sha,
+  }).success()
 
   // Completed
   if (skipped_filenames.length > 0) {

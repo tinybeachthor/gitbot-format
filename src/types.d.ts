@@ -56,11 +56,15 @@ declare module types {
 
   interface Checkrun {
     error: (error: string) => Promise<void>
+
     queued: () => Promise<void>
     progress: (time: Date) => Promise<void>
+
     failure: (annotations: Annotation[], lines: number, skipped: string[])
       => Promise<void>
     warningSkipped: (skipped: string[]) => Promise<void>
     success: () => Promise<void>
+
+    getAPI: () => any
   }
 }
