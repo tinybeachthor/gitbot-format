@@ -1,14 +1,4 @@
-const { name, version, bugs } = require('../package.json')
 import { successGifs, failureGifs } from './gifs'
-
-const versionString = `
-
-Formatted with :heart: by ${name}@${version}
-`
-const bugsString = `
-
-Please report this issue at: ${bugs}
-`
 
 function getForSha(collection: any[], hash: string) {
   function hash2number(hash: string) {
@@ -34,7 +24,7 @@ export default (checks: any, statusInfo: types.CheckrunInfo): types.Checkrun => 
       conclusion: "failure",
       output: {
         title: 'Error',
-        summary: `Error occurred : ${error}` + versionString + bugsString,
+        summary: `Error occurred : ${error}`,
       },
     })
   }
@@ -45,7 +35,7 @@ export default (checks: any, statusInfo: types.CheckrunInfo): types.Checkrun => 
       status: "queued",
       output: {
         title: 'Queued...',
-        summary: 'Waiting to run' + versionString,
+        summary: 'Waiting to run',
       },
     })
   }
@@ -59,7 +49,7 @@ export default (checks: any, statusInfo: types.CheckrunInfo): types.Checkrun => 
       started_at,
       output: {
         title: 'Formatting...',
-        summary: 'Running the job' + versionString,
+        summary: 'Running the job',
       },
     })
   }
@@ -75,7 +65,7 @@ export default (checks: any, statusInfo: types.CheckrunInfo): types.Checkrun => 
       conclusion: "action_required",
       output: {
         title: `${lines} lines need formatting`,
-        summary: `Showing first 50 formatting issues.` + skipped_report + versionString,
+        summary: `Showing first 50 formatting issues.` + skipped_report,
         images: [
           {
             alt: 'sad',
@@ -109,7 +99,7 @@ export default (checks: any, statusInfo: types.CheckrunInfo): types.Checkrun => 
         ...options,
         output: {
           title: `Skipped ${filename}`,
-          summary: `Failed to get or process following file:\n${filename}` + versionString + bugsString,
+          summary: `Failed to get or process following file:\n${filename}`,
         },
       })
     }
@@ -119,7 +109,7 @@ export default (checks: any, statusInfo: types.CheckrunInfo): types.Checkrun => 
         ...options,
         output: {
           title: `Skipped ${skipped.length} files`,
-          summary: `Failed to get or process following files:\n${filenames}` + versionString + bugsString,
+          summary: `Failed to get or process following files:\n${filenames}`,
         },
       })
     }
@@ -134,7 +124,7 @@ export default (checks: any, statusInfo: types.CheckrunInfo): types.Checkrun => 
       conclusion: "success",
       output: {
         title: 'Format all right!',
-        summary: 'Beautiful code right there!' + versionString,
+        summary: 'Beautiful code right there!',
         images: [
           {
             alt: 'happy',
