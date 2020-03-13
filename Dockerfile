@@ -18,4 +18,4 @@ RUN npm run build
 
 # start
 USER node
-CMD ["node", "/gitbot-format/dist/index.js"]
+CMD ["node", "/gitbot-format/out/index.js"]
