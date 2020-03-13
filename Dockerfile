@@ -8,11 +8,14 @@ RUN apk update && apk add \
 # install app
 WORKDIR /gitbot-format
 ADD package.json package-lock.json ./
-RUN npm install --production --frozen-lockfile
+RUN npm install --frozen-lockfile
 
 # add app files
-COPY ./dist/ ./
+COPY . .
+
+# build
+RUN npm run build
 
 # start
 USER node
-CMD ["node", "/gitbot-format/index.js"]
+CMD ["node", "/gitbot-format/dist/index.js"]
