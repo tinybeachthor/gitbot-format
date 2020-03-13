@@ -10,7 +10,7 @@
   "bugs": "https://github.com/WhoMeNope/gitbot-format/issues",
   "scripts": {
     "build": "tsc",
-    "start": "node index.js",
+    "start": "node out/index.js",
     "test": "jest",
     "test:watch": "jest --watch --notify --notifyMode=change --coverage"
   },
