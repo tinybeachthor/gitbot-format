@@ -141,7 +141,5 @@ export default (checks: any, statusInfo: types.CheckrunInfo): types.Checkrun => 
     failure,
     warningSkipped,
     success,
-
-    getAPI: () => checks,
   }
 }
