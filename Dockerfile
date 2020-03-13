@@ -11,7 +11,7 @@ ADD package.json package-lock.json ./
 RUN npm install --production --frozen-lockfile
 
 # add app files
-COPY . .
+COPY ./out/ ./
 
 # start
 USER node
