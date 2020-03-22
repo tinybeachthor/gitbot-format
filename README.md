@@ -1,25 +1,85 @@
-# gitbot-format
+# gitbot-format - GitHub Action
 
-GitHub Action
+Keeps your repo tidy by running ```clang-format``` on every PR.
 
-Keeps your repos tidy by running ```clang-format``` on every PR.
+## Setup
+
+Add the following to `.github/workflows/pr.yaml`:
+
+```yaml
+name: PR
+
+on:
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    name: checks
+    steps:
+    - name: clang-format
+      id: clang-format
+      uses: WhoMeNope/gitbot-format@releases/v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        config-path: '.clang-format'
+```
+
+Enjoy automatic `clang-format` linting.
+
+Optionally, to allow formatting, add `.github/workflows/comment.yaml`:
+
+```yaml
+name: Comment
+
+on:
+  pull_request:
+    types:
+    - opened
+    - edited
+  issue_comment:
+    types:
+    - created
+    - edited
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    name: Format
+    env:
+      TAKE_ACTION: true
+    steps:
+    - name: Check for trigger word
+      uses: khan/pull-request-comment-trigger@1.0.0
+      id: trigger
+      with:
+        trigger: '/format'
+        reaction: hooray
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: clang-format
+      id: clang-format
+      uses: WhoMeNope/gitbot-format@releases/v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        config-path: '.clang-format'
+      if: steps.trigger.outputs.triggered == 'true'
+```
+
+This will trigger auto-formatting whenever you comment `/format` in a PR.
 
 ## Features
 
 ### Respects repo stylefile
 
 Just a regular ```.clang-format``` file in the root of the repo.
-Looks on the default branch first, PR branch second, and lastly defaults
-to ```-style=Google```.
+Checks on the default branch first, PR branch second, and defaults
+to ```-style=Google``` if none found.
 
-### Zero setup
+### Only checks changed files
 
-No setup necessary, just install in GitHub and enjoy.
-
-### Fully stateless
-
-On every restart it rechecks all open PRs in installed repos.
-Making it easy to restart/upgrade/migrate/manage the deployment.
+Only looks on files changed in a PR, so that it does not introduce extra changes
+from beyond the scope of the PR.
 
 ## FAQ
 
