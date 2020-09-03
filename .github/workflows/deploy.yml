@@ -24,7 +24,7 @@ jobs:
     - name: Publish to DockerHub
       uses: elgohr/Publish-Docker-Github-Action@2.13
       with:
-        name: whomenope/gitbot-format
+        name: tinybeachthor/gitbot-format
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         dockerfile: Dockerfile

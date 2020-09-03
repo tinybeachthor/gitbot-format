@@ -19,7 +19,7 @@ jobs:
     steps:
     - name: clang-format
       id: clang-format
-      uses: WhoMeNope/gitbot-format@releases/v1
+      uses: tinybeachthor/gitbot-format@releases/v1
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         config-path: '.clang-format'
@@ -59,7 +59,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: clang-format
       id: clang-format
-      uses: WhoMeNope/gitbot-format@releases/v1
+      uses: tinybeachthor/gitbot-format@releases/v1
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         config-path: '.clang-format'
@@ -91,4 +91,4 @@ from beyond the scope of the PR.
 
 ## License
 
-[ISC](LICENSE) © 2020 Martin Toman <whomenope@outlook.com>
+[ISC](LICENSE) © 2020 Martin Toman <toman.martin@live.com>
