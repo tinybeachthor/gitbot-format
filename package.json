@@ -16,7 +16,7 @@
   },
   "main": "out/index.js",
   "dependencies": {
-    "@actions/core": "^1.2.3",
+    "@actions/core": "^1.2.6",
     "@actions/github": "^2.1.1",
     "js-yaml": "^3.13.1",
     "temp-write": "^4.0.0"
